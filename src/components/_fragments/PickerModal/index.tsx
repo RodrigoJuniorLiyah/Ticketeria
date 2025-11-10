@@ -78,18 +78,21 @@ const PickerModal = ({
               selectedValue={selectedValue}
               onValueChange={(value) => onValueChange(value as string)}
               dropdownIconColor={theme.colors.text}
+              style={{
+                color: theme.colors.text,
+              }}
             >
               <Picker.Item
                 label={placeholder}
                 value=""
-                color={themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary}
+                color={themeMode === 'light' ? theme.colors.textLight : theme.colors.textSecondary}
               />
               {items.map((item) => (
                 <Picker.Item
                   key={item.value}
                   label={item.label}
                   value={item.value}
-                  color={themeMode === 'light' ? '#1F2937' : theme.colors.text}
+                  color={themeMode === 'light' ? theme.colors.textLight : theme.colors.text}
                 />
               ))}
             </StyledPicker>
