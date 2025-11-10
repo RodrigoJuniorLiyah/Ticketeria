@@ -27,8 +27,11 @@ import {
   TextArea,
   SelectContainer,
   SelectButton,
+  SelectLeft,
+  SelectIcon,
   SelectText,
   SelectPlaceholder,
+  SelectArrow,
   ErrorText,
   ButtonContainer,
   SubmitButton,
@@ -59,7 +62,12 @@ interface FormErrors {
 
 const CreateTicket = () => {
   const navigation = useNavigation<any>();
-  const { theme } = useTheme();
+  const { theme, themeMode } = useTheme();
+  
+  const getContrastIconColor = (isSelected: boolean) => {
+    if (isSelected) return theme.colors.primary;
+    return themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary;
+  };
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -315,13 +323,29 @@ const CreateTicket = () => {
 
           <FormGroup>
             <Label>Categoria *</Label>
-            <SelectContainer>
-              <SelectButton onPress={() => setShowCategoryPicker(true)}>
-                {category ? (
-                  <SelectText>{category}</SelectText>
-                ) : (
-                  <SelectPlaceholder>Selecione uma categoria</SelectPlaceholder>
-                )}
+            <SelectContainer hasError={!!errors.category}>
+              <SelectButton onPress={() => setShowCategoryPicker(true)} activeOpacity={0.7}>
+                <SelectLeft>
+                  <SelectIcon>
+                    <Ionicons
+                      name="folder-outline"
+                      size={20}
+                      color={getContrastIconColor(!!category)}
+                    />
+                  </SelectIcon>
+                  {category ? (
+                    <SelectText>{category}</SelectText>
+                  ) : (
+                    <SelectPlaceholder>Selecione uma categoria</SelectPlaceholder>
+                  )}
+                </SelectLeft>
+                <SelectArrow>
+                  <Ionicons
+                    name="chevron-down"
+                    size={20}
+                    color={themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary}
+                  />
+                </SelectArrow>
               </SelectButton>
             </SelectContainer>
             {errors.category && <ErrorText>{errors.category}</ErrorText>}
@@ -347,10 +371,26 @@ const CreateTicket = () => {
           <FormGroup>
             <Label>Prioridade</Label>
             <SelectContainer>
-              <SelectButton onPress={() => setShowPriorityPicker(true)}>
-                <SelectText>
-                  {TICKET_PRIORITIES.find((p) => p.value === priority)?.label || 'Média'}
-                </SelectText>
+              <SelectButton onPress={() => setShowPriorityPicker(true)} activeOpacity={0.7}>
+                <SelectLeft>
+                  <SelectIcon>
+                    <Ionicons
+                      name="flag-outline"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                  </SelectIcon>
+                  <SelectText>
+                    {TICKET_PRIORITIES.find((p) => p.value === priority)?.label || 'Média'}
+                  </SelectText>
+                </SelectLeft>
+                <SelectArrow>
+                  <Ionicons
+                    name="chevron-down"
+                    size={20}
+                    color={themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary}
+                  />
+                </SelectArrow>
               </SelectButton>
             </SelectContainer>
 

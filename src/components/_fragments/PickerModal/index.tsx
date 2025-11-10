@@ -5,10 +5,16 @@ import { Picker } from '@react-native-picker/picker';
 import {
   ModalOverlay,
   ModalContent,
+  ModalHandle,
   ModalHeader,
+  ModalButtonContainer,
   ModalButton,
   ModalButtonText,
+  PickerContainer,
+  StyledPicker,
 } from './styles';
+
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface PickerItem {
   label: string;
@@ -34,10 +40,16 @@ const PickerModal = ({
   onClose,
   onConfirm,
 }: PickerModalProps) => {
+  const { theme, themeMode } = useTheme();
+
   const handleConfirm = () => {
     if (onConfirm) {
       onConfirm();
     }
+    onClose();
+  };
+
+  const handleOverlayPress = () => {
     onClose();
   };
 
@@ -48,22 +60,40 @@ const PickerModal = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <ModalOverlay>
+      <ModalOverlay activeOpacity={1} onPress={handleOverlayPress}>
         <ModalContent>
+          <ModalHandle />
           <ModalHeader>
-            <ModalButton onPress={onClose}>
-              <ModalButtonText>Cancelar</ModalButtonText>
-            </ModalButton>
-            <ModalButton onPress={handleConfirm}>
-              <ModalButtonText>Confirmar</ModalButtonText>
-            </ModalButton>
+            <ModalButtonContainer>
+              <ModalButton onPress={onClose}>
+                <ModalButtonText variant="secondary">Cancelar</ModalButtonText>
+              </ModalButton>
+              <ModalButton onPress={handleConfirm}>
+                <ModalButtonText variant="primary">Confirmar</ModalButtonText>
+              </ModalButton>
+            </ModalButtonContainer>
           </ModalHeader>
-          <Picker selectedValue={selectedValue} onValueChange={onValueChange}>
-            <Picker.Item label={placeholder} value="" />
-            {items.map((item) => (
-              <Picker.Item key={item.value} label={item.label} value={item.value} />
-            ))}
-          </Picker>
+          <PickerContainer>
+            <StyledPicker
+              selectedValue={selectedValue}
+              onValueChange={(value) => onValueChange(value as string)}
+              dropdownIconColor={theme.colors.text}
+            >
+              <Picker.Item
+                label={placeholder}
+                value=""
+                color={themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary}
+              />
+              {items.map((item) => (
+                <Picker.Item
+                  key={item.value}
+                  label={item.label}
+                  value={item.value}
+                  color={themeMode === 'light' ? '#1F2937' : theme.colors.text}
+                />
+              ))}
+            </StyledPicker>
+          </PickerContainer>
         </ModalContent>
       </ModalOverlay>
     </Modal>

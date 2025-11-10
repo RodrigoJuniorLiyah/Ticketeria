@@ -1,5 +1,10 @@
 import styled from 'styled-components/native';
 
+const getContrastColor = (theme: any, lightColor: string, darkColor: string) => {
+  const isLight = theme.colors.background === '#F5F7FA';
+  return isLight ? lightColor : darkColor;
+};
+
 export const Container = styled.ScrollView`
   flex: 1;
 
@@ -79,12 +84,15 @@ export const TextArea = styled.TextInput`
   text-align-vertical: top;
 `;
 
-export const SelectContainer = styled.View`
+export const SelectContainer = styled.View<{ hasError?: boolean }>`
   border-radius: ${({ theme }) => theme.borderRadius.lg}px;
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.border};
+  border-width: 1.5px;
+  border-color: ${({ hasError, theme }) => (hasError ? theme.colors.error : theme.colors.border)};
 
   background-color: ${({ theme }) => theme.colors.surface};
+
+  box-shadow: ${({ theme }) => theme.shadows.small};
+  elevation: 2;
 `;
 
 export const SelectButton = styled.TouchableOpacity`
@@ -93,18 +101,47 @@ export const SelectButton = styled.TouchableOpacity`
   align-items: center;
 
   padding: ${({ theme }) => theme.spacing.md}px;
+  min-height: 48px;
+`;
+
+export const SelectLeft = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const SelectIcon = styled.View`
+  width: 24px;
+  height: 24px;
+  margin-right: ${({ theme }) => theme.spacing.sm}px;
+
+  justify-content: center;
+  align-items: center;
 `;
 
 export const SelectText = styled.Text`
+  flex: 1;
+
   font-size: ${({ theme }) => theme.fontSize.md}px;
+  font-weight: 500;
 
   color: ${({ theme }) => theme.colors.text};
 `;
 
 export const SelectPlaceholder = styled.Text`
+  flex: 1;
+
   font-size: ${({ theme }) => theme.fontSize.md}px;
 
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => getContrastColor(theme, '#6B7280', theme.colors.textSecondary)};
+`;
+
+export const SelectArrow = styled.View`
+  width: 24px;
+  height: 24px;
+
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ErrorText = styled.Text`
@@ -117,7 +154,6 @@ export const ErrorText = styled.Text`
 
 export const ButtonContainer = styled.View`
   margin-top: ${({ theme }) => theme.spacing.lg}px;
-  margin-bottom: ${({ theme }) => theme.spacing.xl}px;
 `;
 
 export const SubmitButton = styled.TouchableOpacity<{ disabled: boolean }>`
