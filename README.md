@@ -388,7 +388,7 @@ yarn start:reset
 ```
 
 **Erro ao instalar pods (iOS):**
-```bash
+   ```bash
 cd ios
 pod deintegrate
 pod install
@@ -422,62 +422,31 @@ yarn start --reset-cache
 
   <img src="https://github.com/RodrigoJuniorLiyah.png" alt="Rodrigo Junior" width="150" style="border-radius: 50%;"/>
 
-  
-
   <h3>Rodrigo Junior</h3>
-
-  
 
   <p><strong>Desenvolvedor Front-end & Mobile</strong></p>
 
-  
-
   <p>😺 🐱‍👤 Nothing will make me give up on my dreams.</p>
 
-  
-
   <a href="https://github.com/RodrigoJuniorLiyah" target="_blank">
-
     <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
-
   </a>
-
-  
-
   <a href="https://www.linkedin.com/in/rodrigo-cabral-dev/" target="_blank">
-
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/>
-
   </a>
-
-  
-
   <a href="mailto:rodrigo.junior7@outlook.com" target="_blank">
-
     <img src="https://img.shields.io/badge/Email-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white" alt="Email"/>
-
   </a>
-
-  
 
   <br><br>
 
-  
-
   <p><strong>🌱 Atualmente aprendendo:</strong> Node.js, Python, English</p>
-
   <p><strong>💬 Pergunte-me sobre:</strong> JavaScript, TypeScript, CSS e React</p>
-
   <p><strong>⚡ Curiosidade:</strong> Eu amo animes 😜</p>
-
-  
 
   <br>
 
-  
-
   <p><em>Desenvolvido com ❤️ usando React Native</em></p>
-
   <p><strong>Teste Técnico - Desenvolvedor Mobile</strong></p>
 
 </div>
