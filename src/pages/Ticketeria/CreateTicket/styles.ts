@@ -81,7 +81,6 @@ export const TextArea = styled.TextInput`
   line-height: 24px;
 
   color: ${({ theme }) => theme.colors.text};
-  text-align-vertical: top;
 `;
 
 export const SelectContainer = styled.View<{ hasError?: boolean }>`

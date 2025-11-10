@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, KeyboardAvoidingView } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -14,7 +14,7 @@ export const KeyboardAvoidingWrapper = styled(KeyboardAvoidingView).attrs<{ beha
   flex: 1;
 `;
 
-export const Content = styled(ScrollView).attrs(({ theme }) => ({
+export const Content = styled(ScrollView).attrs(() => ({
   keyboardShouldPersistTaps: 'handled',
   keyboardDismissMode: 'interactive',
   showsVerticalScrollIndicator: false,
