@@ -1,12 +1,15 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Linking } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { Alert, Platform, Linking, ScrollView, ActivityIndicator } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import TicketStatusBadge from '../../../components/_fragments/TicketStatusBadge';
 import TicketComment from '../../../components/_fragments/TicketComment';
 import { TicketApi } from '../../../services/TicketApi';
 import { ticketStorage } from '../../../helpers/ticketStorage';
+import { attachmentStorage } from '../../../helpers/attachmentStorage';
+import { attachmentSync } from '../../../helpers/attachmentSync';
 import { useNetwork } from '../../../contexts/NetworkContext';
 import { formatDate, getPriorityLabel, formatFileSize, getFileIcon } from '../../../utils/ticket.utils';
 import {
@@ -42,26 +45,28 @@ import {
   AttachmentName,
   AttachmentMeta,
   AttachmentDownload,
-          EmptyAttachments,
-          EmptyAttachmentsText,
-          OfflineBanner,
-          OfflineBannerText,
-        } from './styles';
+  OfflineBanner,
+  OfflineBannerText,
+  KeyboardAvoidingWrapper,
+} from './styles';
 
-import { Ticket, Comment, Attachment } from '../../../types/ticket.types';
+import { Ticket, Attachment } from '../../../types/ticket.types';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { mergeTicketComments, hasDuplicateComment } from './helpers';
 
 const TicketDetails = () => {
   const { theme } = useTheme();
   const { isOnline } = useNetwork();
   const route = useRoute<any>();
-  const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [ticket, setTicket] = useState<Ticket>(route.params?.ticket);
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const isSubmittingRef = useRef(false);
   const commentTextRef = useRef(commentText);
+  const isInitialLoadRef = useRef(true);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   React.useEffect(() => {
     commentTextRef.current = commentText;
@@ -72,9 +77,43 @@ const TicketDetails = () => {
       const initialTicket = route.params?.ticket;
       if (!initialTicket?.id) return;
 
+      const isFirstLoad = isInitialLoadRef.current;
+      if (isFirstLoad) {
+        isInitialLoadRef.current = false;
+      } else if (!isOnline) {
+        return;
+      }
+
       const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
-      if (cachedTicket) {
-        setTicket(cachedTicket);
+      if (cachedTicket && isFirstLoad) {
+        const cachedAttachments = await attachmentStorage.getAllAttachmentsMetadata(initialTicket.id);
+        const pendingAttachments = await attachmentStorage.getPendingAttachments(initialTicket.id);
+
+        if (cachedAttachments.length > 0 || pendingAttachments.length > 0) {
+          const allAttachments = [
+            ...cachedAttachments.map((meta) => ({
+              id: meta.attachmentId,
+              name: meta.name,
+              url: meta.url || meta.localUri || '',
+              type: meta.type,
+              size: meta.size,
+            })),
+            ...pendingAttachments.map((pending, index) => ({
+              id: `pending-${index}`,
+              name: pending.name,
+              url: pending.uri,
+              type: pending.type,
+              size: pending.size,
+            })),
+          ];
+
+          setTicket({
+            ...cachedTicket,
+            attachments: allAttachments as any,
+          });
+        } else {
+          setTicket(cachedTicket);
+        }
       }
 
       if (!isOnline) {
@@ -91,9 +130,24 @@ const TicketDetails = () => {
       setIsOffline(false);
 
       try {
+        await attachmentSync.syncPendingAttachments(initialTicket.id);
+
         const fetchedTicket = await TicketApi.getById(initialTicket.id);
-        setTicket(fetchedTicket);
-        await ticketStorage.saveTicketDetails(fetchedTicket.id, fetchedTicket);
+
+        if (fetchedTicket.attachments && fetchedTicket.attachments.length > 0) {
+          for (const attachment of fetchedTicket.attachments) {
+            await attachmentStorage.saveAttachmentMetadata(
+              fetchedTicket.id,
+              attachment
+            );
+          }
+        }
+
+        setTicket((prevTicket) => {
+          const mergedTicket = mergeTicketComments(prevTicket, fetchedTicket);
+          ticketStorage.saveTicketDetails(mergedTicket.id, mergedTicket);
+          return mergedTicket;
+        });
       } catch (error) {
         const isNetworkError = error instanceof Error && (error as any).isNetworkError;
         if (isNetworkError) {
@@ -114,10 +168,10 @@ const TicketDetails = () => {
     };
 
     loadTicketDetails();
-  }, [route.params?.ticket?.id, isOnline]);
+  }, [route.params?.ticket?.id, isOnline, route.params?.ticket]);
 
   const ticketIdRef = useRef(ticket.id);
-  
+
   React.useEffect(() => {
     ticketIdRef.current = ticket.id;
   }, [ticket.id]);
@@ -128,7 +182,7 @@ const TicketDetails = () => {
     }
 
     const currentText = commentTextRef.current.trim();
-    
+
     if (!currentText) {
       return;
     }
@@ -140,8 +194,12 @@ const TicketDetails = () => {
     try {
       const ticketId = ticketIdRef.current;
       const newComment = await TicketApi.addComment(ticketId, currentText);
-      
+
       setTicket((prevTicket) => {
+        if (hasDuplicateComment(prevTicket.comments, newComment.id)) {
+          return prevTicket;
+        }
+
         const updatedTicket = {
           ...prevTicket,
           comments: [...(prevTicket.comments || []), newComment],
@@ -181,10 +239,16 @@ const TicketDetails = () => {
     [ticket.id]
   );
 
+  const handleCommentInputFocus = useCallback(() => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, Platform.OS === 'ios' ? 250 : 100);
+  }, []);
+
   const handleAttachmentPress = useCallback(async (attachment: Attachment) => {
     try {
       const url = attachment.url;
-      
+
       if (!url) {
         Alert.alert('Erro', 'URL do anexo não disponível.');
         return;
@@ -192,7 +256,7 @@ const TicketDetails = () => {
 
       const isMockUrl = url.includes('example.com') || url.includes('mock');
       const isLocalUri = url.startsWith('file://') || url.startsWith('content://');
-      
+
       if (isMockUrl) {
         Alert.alert(
           'Anexo de Demonstração',
@@ -234,7 +298,7 @@ const TicketDetails = () => {
         } catch (error: any) {
           const errorMessage = error?.message || '';
           console.error('Erro ao abrir anexo local:', error);
-          
+
           if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
             Alert.alert(
               'Aviso',
@@ -283,7 +347,7 @@ const TicketDetails = () => {
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro desconhecido';
       console.error('Erro ao abrir anexo:', error);
-      
+
       if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
         Alert.alert(
           'Aviso',
@@ -298,12 +362,11 @@ const TicketDetails = () => {
 
   return (
     <Container>
-      <KeyboardAvoidingView
+      <KeyboardAvoidingWrapper
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <Content>
+        <Content ref={scrollViewRef}>
           {isOffline && (
             <OfflineBanner>
               <OfflineBannerText>
@@ -337,7 +400,7 @@ const TicketDetails = () => {
               <InfoValue>{formatDate(ticket.updatedAt)}</InfoValue>
             </InfoRow>
             {ticket.createdBy && (
-              <InfoRow>
+              <InfoRow isLast>
                 <InfoLabel>Criado por:</InfoLabel>
                 <InfoValue>{ticket.createdBy.name}</InfoValue>
               </InfoRow>
@@ -404,43 +467,59 @@ const TicketDetails = () => {
               )}
             </CommentsList>
           </CommentsCard>
+
+          <ActionButtons>
+            {ticket.status !== 'resolved' && (
+              <ActionButton onPress={() => handleStatusChange('resolved')} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator size="small" color={theme.colors.surface} />
+                ) : (
+                  <ActionButtonText disabled={loading}>Marcar como Resolvido</ActionButtonText>
+                )}
+              </ActionButton>
+            )}
+            {ticket.status !== 'closed' && (
+              <ActionButton onPress={() => handleStatusChange('closed')} disabled={loading}>
+                {loading ? (
+                  <ActivityIndicator size="small" color={theme.colors.surface} />
+                ) : (
+                  <ActionButtonText disabled={loading}>Fechar Ticket</ActionButtonText>
+                )}
+              </ActionButton>
+            )}
+          </ActionButtons>
         </Content>
 
-        <ActionButtons>
-          {ticket.status !== 'resolved' && (
-            <ActionButton onPress={() => handleStatusChange('resolved')} disabled={loading}>
-              <ActionButtonText>Marcar como Resolvido</ActionButtonText>
-            </ActionButton>
-          )}
-          {ticket.status !== 'closed' && (
-            <ActionButton onPress={() => handleStatusChange('closed')} disabled={loading}>
-              <ActionButtonText>Fechar Ticket</ActionButtonText>
-            </ActionButton>
-          )}
-        </ActionButtons>
-
-        <CommentInputContainer>
+        <CommentInputContainer bottomInset={insets.bottom}>
           <CommentInputWrapper>
             <CommentInput
               placeholder="Adicione um comentário..."
               value={commentText}
               onChangeText={setCommentText}
+              onFocus={handleCommentInputFocus}
               multiline
               placeholderTextColor={theme.colors.textSecondary}
+              returnKeyType="default"
+              blurOnSubmit={false}
+              editable={!loading}
             />
           </CommentInputWrapper>
           <SendButton
             disabled={!commentText.trim() || loading}
             onPress={handleAddComment}
           >
-            <Ionicons
-              name="send"
-              size={20}
-              color={commentText.trim() && !loading ? theme.colors.surface : theme.colors.textSecondary}
-            />
+            {loading ? (
+              <ActivityIndicator size="small" color={theme.colors.surface} />
+            ) : (
+              <Ionicons
+                name="send"
+                size={20}
+                color={commentText.trim() && !loading ? theme.colors.surface : theme.colors.textSecondary}
+              />
+            )}
           </SendButton>
         </CommentInputContainer>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingWrapper>
     </Container>
   );
 };

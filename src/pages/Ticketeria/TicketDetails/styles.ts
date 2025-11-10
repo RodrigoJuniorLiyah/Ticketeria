@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -6,7 +7,21 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const Content = styled.ScrollView`
+export const KeyboardAvoidingWrapper = styled(KeyboardAvoidingView).attrs<{ behavior?: 'padding' | 'height' | 'position' | undefined; keyboardVerticalOffset?: number }>(({ behavior, keyboardVerticalOffset }) => ({
+  behavior: behavior,
+  keyboardVerticalOffset: keyboardVerticalOffset,
+}))`
+  flex: 1;
+`;
+
+export const Content = styled(ScrollView).attrs(({ theme }) => ({
+  keyboardShouldPersistTaps: 'handled',
+  keyboardDismissMode: 'interactive',
+  showsVerticalScrollIndicator: false,
+  contentContainerStyle: {
+    
+  },
+}))`
   flex: 1;
 `;
 
@@ -15,6 +30,7 @@ export const HeaderCard = styled.View`
 
   padding: ${({ theme }) => theme.spacing.lg}px;
   margin: ${({ theme }) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
 
@@ -27,7 +43,7 @@ export const Title = styled.Text`
   font-weight: 600;
   line-height: 32px;
 
-  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
 
   color: ${({ theme }) => theme.colors.text};
 `;
@@ -36,8 +52,6 @@ export const HeaderMeta = styled.View`
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
-
-  margin-bottom: ${({ theme }) => theme.spacing.md}px;
 `;
 
 export const InfoCard = styled.View`
@@ -45,6 +59,7 @@ export const InfoCard = styled.View`
 
   padding: ${({ theme }) => theme.spacing.lg}px;
   margin: ${({ theme }) => theme.spacing.md}px;
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
 
@@ -61,18 +76,23 @@ export const InfoTitle = styled.Text`
   color: ${({ theme }) => theme.colors.text};
 `;
 
-export const InfoRow = styled.View`
+export const InfoRow = styled.View<{ isLast?: boolean }>`
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 
-  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
+  padding: ${({ theme }) => theme.spacing.sm}px 0;
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
+
+  border-bottom-width: ${({ isLast }) => (isLast ? 0 : 1)}px;
+  border-bottom-color: ${({ theme }) => theme.colors.border};
 `;
 
 export const InfoLabel = styled.Text`
   font-size: ${({ theme }) => theme.fontSize.sm}px;
-  font-weight: 500;
+  font-weight: 600;
 
-  width: 100px;
+  width: 110px;
+  min-width: 110px;
 
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
@@ -81,6 +101,7 @@ export const InfoValue = styled.Text`
   flex: 1;
 
   font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
 
   color: ${({ theme }) => theme.colors.text};
 `;
@@ -90,6 +111,7 @@ export const DescriptionCard = styled.View`
 
   padding: ${({ theme }) => theme.spacing.lg}px;
   margin: ${({ theme }) => theme.spacing.md}px;
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
 
@@ -109,6 +131,7 @@ export const CommentsCard = styled.View`
 
   padding: ${({ theme }) => theme.spacing.lg}px;
   margin: ${({ theme }) => theme.spacing.md}px;
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
 
@@ -118,62 +141,71 @@ export const CommentsCard = styled.View`
 
 export const CommentsList = styled.View`
   margin-top: ${({ theme }) => theme.spacing.md}px;
+  gap: ${({ theme }) => theme.spacing.sm}px;
 `;
 
 export const ActionButtons = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.sm}px;
 
   padding: ${({ theme }) => theme.spacing.md}px;
+  margin: ${({ theme }) => theme.spacing.md}px;
   margin-top: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
-  border-top-width: 1px;
-  border-top-color: ${({ theme }) => theme.colors.border};
-`;
-
-export const ActionButton = styled.TouchableOpacity`
-  flex: 1;
-
   border-radius: ${({ theme }) => theme.borderRadius.lg}px;
-
-  padding: ${({ theme }) => theme.spacing.md}px;
-  margin-right: ${({ theme }) => theme.spacing.sm}px;
-
-  background-color: ${({ theme }) => theme.colors.primary};
 
   box-shadow: ${({ theme }) => theme.shadows.small};
   elevation: 2;
 `;
 
-export const ActionButtonText = styled.Text`
+export const ActionButton = styled.TouchableOpacity<{ disabled?: boolean }>`
+  flex: 1;
+
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  padding: ${({ theme }) => theme.spacing.md}px;
+
+  background-color: ${({ disabled, theme }) => (disabled ? theme.colors.border : theme.colors.primary)};
+
+  box-shadow: ${({ theme }) => theme.shadows.small};
+  elevation: 2;
+`;
+
+export const ActionButtonText = styled.Text<{ disabled?: boolean }>`
   font-size: ${({ theme }) => theme.fontSize.md}px;
   font-weight: 600;
   text-align: center;
 
-  color: ${({ theme }) => theme.colors.surface};
+  color: ${({ disabled, theme }) => (disabled ? theme.colors.textSecondary : theme.colors.surface)};
 `;
 
-export const CommentInputContainer = styled.View`
+export const CommentInputContainer = styled.View<{ bottomInset?: number }>`
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm}px;
 
   padding: ${({ theme }) => theme.spacing.md}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
   border-top-width: 1px;
   border-top-color: ${({ theme }) => theme.colors.border};
+
+  box-shadow: ${({ theme }) => theme.shadows.medium};
+  elevation: 4;
 `;
 
 export const CommentInputWrapper = styled.View`
   flex: 1;
+  min-height: 48px;
+  max-height: 120px;
 
-  border-radius: ${({ theme }) => theme.borderRadius.lg}px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
   border-width: 1px;
   border-color: ${({ theme }) => theme.colors.border};
 
   padding: ${({ theme }) => theme.spacing.sm}px ${({ theme }) => theme.spacing.md}px;
-  margin-right: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -192,12 +224,16 @@ export const CommentInput = styled.TextInput`
 export const SendButton = styled.TouchableOpacity<{ disabled: boolean }>`
   width: 48px;
   height: 48px;
-  border-radius: ${({ theme }) => theme.borderRadius.lg}px;
+  min-height: 48px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
 
   justify-content: center;
   align-items: center;
 
   background-color: ${({ disabled, theme }) => (disabled ? theme.colors.border : theme.colors.primary)};
+
+  box-shadow: ${({ disabled, theme }) => (disabled ? 'none' : theme.shadows.small)};
+  elevation: ${({ disabled }) => (disabled ? 0 : 2)};
 `;
 
 export const EmptyComments = styled.View`
@@ -218,6 +254,7 @@ export const AttachmentsCard = styled.View`
 
   padding: ${({ theme }) => theme.spacing.lg}px;
   margin: ${({ theme }) => theme.spacing.md}px;
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.surface};
 
@@ -240,6 +277,8 @@ export const AttachmentItem = styled.TouchableOpacity`
   margin-bottom: ${({ theme }) => theme.spacing.sm}px;
 
   background-color: ${({ theme }) => theme.colors.background};
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.border};
 `;
 
 export const AttachmentLeft = styled.View`

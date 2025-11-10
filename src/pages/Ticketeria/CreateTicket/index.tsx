@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TicketApi } from '../../../services/TicketApi';
 import { ticketStorage } from '../../../helpers/ticketStorage';
+import { attachmentStorage } from '../../../helpers/attachmentStorage';
 import { TICKET_CATEGORIES, TICKET_PRIORITIES } from '../../../constants/ticket.constants';
 import {
   validateTicketTitle,
@@ -175,18 +176,48 @@ const CreateTicket = () => {
       const createdTicket = await TicketApi.create(ticketData);
 
       if (attachments.length > 0) {
-        try {
-          for (const attachment of attachments) {
-            await TicketApi.uploadAttachment(createdTicket.id, {
+        const uploadedAttachments: Array<{ attachment: unknown; localUri: string }> = [];
+        const failedAttachments: Array<{ name: string; uri: string }> = [];
+
+        for (const attachment of attachments) {
+          try {
+            const uploadedAttachment = await TicketApi.uploadAttachment(createdTicket.id, {
               uri: attachment.uri,
               type: attachment.type,
               name: attachment.name,
             });
+
+            await attachmentStorage.saveAttachmentMetadata(
+              createdTicket.id,
+              uploadedAttachment as any,
+              attachment.uri
+            );
+
+            uploadedAttachments.push({
+              attachment: uploadedAttachment,
+              localUri: attachment.uri,
+            });
+          } catch {
+            await attachmentStorage.savePendingAttachment(createdTicket.id, {
+              ticketId: createdTicket.id,
+              uri: attachment.uri,
+              name: attachment.name,
+              type: attachment.type,
+              size: attachment.size,
+              createdAt: new Date().toISOString(),
+            });
+
+            failedAttachments.push({
+              name: attachment.name,
+              uri: attachment.uri,
+            });
           }
-        } catch {
+        }
+
+        if (failedAttachments.length > 0) {
           Alert.alert(
             'Aviso',
-            'Ticket criado com sucesso, mas alguns anexos não puderam ser enviados. Tente adicioná-los novamente nos detalhes do ticket.'
+            `Ticket criado com sucesso, mas ${failedAttachments.length} anexo(s) não puderam ser enviados. Eles serão sincronizados quando você voltar online.`
           );
         }
       }
@@ -201,6 +232,15 @@ const CreateTicket = () => {
           total: cachedList.total + 1,
         };
         await ticketStorage.saveTicketsList(updatedList);
+      } else {
+        const newList: TicketListResponse = {
+          data: [createdTicket],
+          total: 1,
+          page: 1,
+          limit: 20,
+          totalPages: 1,
+        };
+        await ticketStorage.saveTicketsList(newList);
       }
 
       Alert.alert('Sucesso', 'Ticket criado com sucesso!', [
