@@ -13,6 +13,7 @@ interface PendingAttachment {
   createdAt: string;
 }
 
+// Sincroniza anexos que ficaram pendentes quando estava offline
 export const attachmentSync = {
   syncPendingAttachments: async (ticketId: string | number): Promise<void> => {
     try {

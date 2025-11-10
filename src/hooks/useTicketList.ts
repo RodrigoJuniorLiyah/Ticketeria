@@ -74,6 +74,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
 
         const hasFilters = filter !== 'all' || search.trim();
 
+        // Carrega do cache primeiro se não tiver filtros (melhor UX)
         if (reset && useCache && !hasFilters && pageNum === 1) {
           const cachedData = await ticketStorage.getTicketsList();
           if (cachedData && cachedData.data.length > 0) {
@@ -98,6 +99,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
         if (reset) {
           setTickets(response.data);
         } else {
+          // Append para paginação
           setTickets((prev) => [...prev, ...response.data]);
         }
 
@@ -107,6 +109,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
         const wasOffline = isOfflineRef.current;
         setIsOffline(false);
         
+        // Se estava offline e voltou, recarrega os dados frescos
         if (wasOffline && reset && !hasFilters) {
           setTimeout(() => {
             loadTickets(1, true, false, currentStatusFilter ?? statusFilterRef.current, currentSearchText ?? searchTextRef.current, false, false);

@@ -9,6 +9,7 @@ import { TicketApiMock } from './TicketApi.mock';
 
 const API_BASE_URL = 'https://api-example.com/v1';
 
+// Usa mock em desenvolvimento, real em produção
 const USE_MOCK = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 let isNetworkOnline = true;
@@ -63,6 +64,7 @@ const handleApiResponse = async <T>(response: Response, context: string): Promis
   return response.json();
 };
 
+// Simula erro de rede quando está offline (para testes)
 const simulateNetworkError = () => {
   if (!isNetworkOnline) {
     const error = new Error('Network request failed');

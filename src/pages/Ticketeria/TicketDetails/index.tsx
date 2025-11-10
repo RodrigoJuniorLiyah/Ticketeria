@@ -68,6 +68,7 @@ const TicketDetails = () => {
   const isInitialLoadRef = useRef(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
+  // Mantém ref atualizado para usar no callback (evita stale closure)
   React.useEffect(() => {
     commentTextRef.current = commentText;
   }, [commentText]);
@@ -77,11 +78,12 @@ const TicketDetails = () => {
       const initialTicket = route.params?.ticket;
       if (!initialTicket?.id) return;
 
+      // Só recarrega se não for o primeiro load ou se estiver online
       const isFirstLoad = isInitialLoadRef.current;
       if (isFirstLoad) {
         isInitialLoadRef.current = false;
       } else if (!isOnline) {
-        return;
+        return; // Não recarrega se estiver offline e não for primeira vez
       }
 
       const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
@@ -187,6 +189,7 @@ const TicketDetails = () => {
       return;
     }
 
+    // Previne múltiplos submits simultâneos
     isSubmittingRef.current = true;
     setLoading(true);
     setCommentText('');
@@ -240,6 +243,7 @@ const TicketDetails = () => {
   );
 
   const handleCommentInputFocus = useCallback(() => {
+    // iOS demora mais para abrir o teclado, precisa de timeout maior
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, Platform.OS === 'ios' ? 250 : 100);

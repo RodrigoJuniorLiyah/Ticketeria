@@ -70,6 +70,7 @@ const TicketList = () => {
     [loading, searching, tickets.length]
   );
 
+  // Evita reload desnecessário na primeira vez que a tela é focada
   useFocusEffect(
     useCallback(() => {
       if (isFirstFocus.current) {
@@ -77,6 +78,7 @@ const TicketList = () => {
         return;
       }
 
+      // Pequeno delay para evitar múltiplos reloads rápidos
       const timer = setTimeout(() => {
         refreshList();
       }, 100);

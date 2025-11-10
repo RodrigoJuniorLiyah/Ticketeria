@@ -79,6 +79,7 @@ const CreateTicket = () => {
   const [attachments, setAttachments] = useState<Array<{ name: string; uri: string; type: string; size: number }>>([]);
   const isPickingDocument = useRef(false);
 
+  // Validação em tempo real conforme o usuário digita
   const handleFieldChange = (field: keyof FormErrors, value: string) => {
     let error: string | undefined;
 
@@ -101,6 +102,7 @@ const CreateTicket = () => {
   };
 
   const handlePickDocument = useCallback(async () => {
+    // Previne múltiplos picks simultâneos
     if (isPickingDocument.current) {
       return;
     }
@@ -143,6 +145,7 @@ const CreateTicket = () => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Valida todos os campos antes de submeter
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
