@@ -105,12 +105,21 @@ const TicketApiReal = {
   
   uploadAttachment: async (id: string | number, file: unknown): Promise<unknown> => {
     try {
-      const formData = new FormData();
-      formData.append('file', file as Blob);
+      const fileData = file as { uri: string; type?: string; name?: string };
       
+      const formData = new FormData();
+      formData.append('file', {
+        uri: fileData.uri,
+        type: fileData.type || 'application/octet-stream',
+        name: fileData.name || 'file',
+      } as any);
+
       const response = await fetch(`${API_BASE_URL}/tickets/${id}/attachments`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
       return handleApiResponse<unknown>(response, 'TicketApi.uploadAttachment');
     } catch (error) {

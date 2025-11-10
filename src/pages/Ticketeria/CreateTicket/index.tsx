@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { pick } from '@react-native-documents/picker';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TicketApi } from '../../../services/TicketApi';
+import { ticketStorage } from '../../../helpers/ticketStorage';
 import { TICKET_CATEGORIES, TICKET_PRIORITIES } from '../../../constants/ticket.constants';
 import {
   validateTicketTitle,
   validateTicketDescription,
   validateTicketCategory,
 } from '../../../utils/validation.utils';
+import { formatFileSize, getFileIcon } from '../../../utils/ticket.utils';
 import PickerModal from '../../../components/_fragments/PickerModal';
 import {
   Container,
@@ -30,9 +34,20 @@ import {
   SubmitButtonText,
   LoadingContainer,
   LoadingText,
+  AttachmentsContainer,
+  AttachmentButton,
+  AttachmentButtonText,
+  AttachmentsList,
+  AttachmentItem,
+  AttachmentInfo,
+  AttachmentIcon,
+  AttachmentDetails,
+  AttachmentName,
+  AttachmentSize,
+  AttachmentRemove,
 } from './styles';
 
-import { Ticket } from '../../../types/ticket.types';
+import { Ticket, TicketListResponse } from '../../../types/ticket.types';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 interface FormErrors {
@@ -52,6 +67,7 @@ const CreateTicket = () => {
   const [loading, setLoading] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [attachments, setAttachments] = useState<Array<{ name: string; uri: string; type: string; size: number }>>([]);
 
   const handleFieldChange = (field: keyof FormErrors, value: string) => {
     let error: string | undefined;
@@ -72,6 +88,33 @@ const CreateTicket = () => {
     }
 
     setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
+  const handlePickDocument = async () => {
+    try {
+      const results = await pick({
+        allowMultiSelection: true,
+      });
+
+      if (results && results.length > 0) {
+        const files = results.map((file) => ({
+          name: file.name || 'arquivo',
+          uri: file.uri,
+          type: file.type || 'application/octet-stream',
+          size: file.size || 0,
+        }));
+
+        setAttachments((prev) => [...prev, ...files]);
+      }
+    } catch (err: any) {
+      if (err?.code !== 'DOCUMENT_PICKER_CANCELED') {
+        Alert.alert('Erro', 'Erro ao selecionar arquivo. Tente novamente.');
+      }
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const validateForm = (): boolean => {
@@ -113,6 +156,35 @@ const CreateTicket = () => {
       };
 
       const createdTicket = await TicketApi.create(ticketData);
+
+      if (attachments.length > 0) {
+        try {
+          for (const attachment of attachments) {
+            await TicketApi.uploadAttachment(createdTicket.id, {
+              uri: attachment.uri,
+              type: attachment.type,
+              name: attachment.name,
+            });
+          }
+        } catch {
+          Alert.alert(
+            'Aviso',
+            'Ticket criado com sucesso, mas alguns anexos não puderam ser enviados. Tente adicioná-los novamente nos detalhes do ticket.'
+          );
+        }
+      }
+
+      await ticketStorage.saveTicketDetails(createdTicket.id, createdTicket);
+
+      const cachedList = await ticketStorage.getTicketsList();
+      if (cachedList) {
+        const updatedList: TicketListResponse = {
+          ...cachedList,
+          data: [createdTicket, ...cachedList.data],
+          total: cachedList.total + 1,
+        };
+        await ticketStorage.saveTicketsList(updatedList);
+      }
 
       Alert.alert('Sucesso', 'Ticket criado com sucesso!', [
         {
@@ -226,6 +298,51 @@ const CreateTicket = () => {
               onValueChange={(value) => setPriority(value as Ticket['priority'])}
               onClose={() => setShowPriorityPicker(false)}
             />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Anexos (opcional)</Label>
+            <AttachmentsContainer>
+              <AttachmentButton onPress={handlePickDocument} activeOpacity={0.7}>
+                <Ionicons name="attach-outline" size={20} color={theme.colors.primary} />
+                <AttachmentButtonText>Selecionar arquivos</AttachmentButtonText>
+              </AttachmentButton>
+
+              {attachments.length > 0 && (
+                <AttachmentsList>
+                  {attachments.map((attachment, index) => {
+                    const fileType = attachment.type || 'application/octet-stream';
+                    const fileSize = attachment.size || 0;
+
+                    return (
+                      <AttachmentItem key={index}>
+                        <AttachmentInfo>
+                          <AttachmentIcon>
+                            <Ionicons
+                              name={getFileIcon(fileType)}
+                              size={18}
+                              color={theme.colors.surface}
+                            />
+                          </AttachmentIcon>
+                          <AttachmentDetails>
+                            <AttachmentName numberOfLines={1}>
+                              {attachment.name || 'Arquivo sem nome'}
+                            </AttachmentName>
+                            <AttachmentSize>{formatFileSize(fileSize)}</AttachmentSize>
+                          </AttachmentDetails>
+                        </AttachmentInfo>
+                        <AttachmentRemove
+                          onPress={() => handleRemoveAttachment(index)}
+                          activeOpacity={0.7}
+                        >
+                          <Ionicons name="close" size={16} color={theme.colors.surface} />
+                        </AttachmentRemove>
+                      </AttachmentItem>
+                    );
+                  })}
+                </AttachmentsList>
+              )}
+            </AttachmentsContainer>
           </FormGroup>
         </FormCard>
 

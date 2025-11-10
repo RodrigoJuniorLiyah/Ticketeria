@@ -3,6 +3,7 @@ import {
   TicketListParams,
   TicketListResponse,
   Comment,
+  Attachment,
 } from '../types/ticket.types';
 
 const MOCK_TICKETS: Ticket[] = [
@@ -21,7 +22,22 @@ const MOCK_TICKETS: Ticket[] = [
       email: 'joao@example.com',
     },
     comments: [],
-    attachments: [],
+    attachments: [
+      {
+        id: 1,
+        name: 'screenshot_erro.png',
+        url: 'https://example.com/attachments/screenshot_erro.png',
+        type: 'image/png',
+        size: 245760,
+      },
+      {
+        id: 2,
+        name: 'log_erro.txt',
+        url: 'https://example.com/attachments/log_erro.txt',
+        type: 'text/plain',
+        size: 15360,
+      },
+    ],
   },
   {
     id: 2,
@@ -49,7 +65,15 @@ const MOCK_TICKETS: Ticket[] = [
         },
       },
     ],
-    attachments: [],
+    attachments: [
+      {
+        id: 3,
+        name: 'proposta_funcionalidade.pdf',
+        url: 'https://example.com/attachments/proposta_funcionalidade.pdf',
+        type: 'application/pdf',
+        size: 512000,
+      },
+    ],
   },
   {
     id: 3,
@@ -275,12 +299,14 @@ export const TicketApiMock = {
       throw new Error(`Ticket com ID ${id} não encontrado`);
     }
 
+    const fileData = file as { name?: string; type?: string; size?: number; uri?: string };
+    
     const attachment = {
       id: Date.now(),
-      name: 'arquivo_anexo.pdf',
-      url: 'https://example.com/attachments/file.pdf',
-      type: 'application/pdf',
-      size: 1024000,
+      name: fileData.name || 'arquivo_anexo.pdf',
+      url: fileData.uri || 'https://example.com/attachments/file.pdf',
+      type: fileData.type || 'application/pdf',
+      size: fileData.size || 1024000,
     };
 
     if (!ticket.attachments) {

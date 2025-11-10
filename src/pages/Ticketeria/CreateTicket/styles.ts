@@ -155,3 +155,97 @@ export const LoadingText = styled.Text`
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
+export const AttachmentsContainer = styled.View`
+  margin-top: ${({ theme }) => theme.spacing.sm}px;
+`;
+
+export const AttachmentButton = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: ${({ theme }) => theme.borderRadius.lg}px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.primary};
+  border-style: dashed;
+
+  padding: ${({ theme }) => theme.spacing.md}px;
+
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+export const AttachmentButtonText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
+
+  margin-left: ${({ theme }) => theme.spacing.sm}px;
+
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+export const AttachmentsList = styled.View`
+  margin-top: ${({ theme }) => theme.spacing.md}px;
+`;
+
+export const AttachmentItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  padding: ${({ theme }) => theme.spacing.sm}px ${({ theme }) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+export const AttachmentInfo = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const AttachmentIcon = styled.View`
+  width: 36px;
+  height: 36px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  justify-content: center;
+  align-items: center;
+  margin-right: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.primaryLight};
+`;
+
+export const AttachmentDetails = styled.View`
+  flex: 1;
+`;
+
+export const AttachmentName = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
+
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
+
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+export const AttachmentSize = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.xs}px;
+
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const AttachmentRemove = styled.TouchableOpacity`
+  width: 32px;
+  height: 32px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  justify-content: center;
+  align-items: center;
+  margin-left: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.error};
+`;
+

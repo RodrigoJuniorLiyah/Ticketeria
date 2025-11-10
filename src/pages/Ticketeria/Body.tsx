@@ -111,6 +111,7 @@ const Body = memo(({
             updateCellsBatchingPeriod={50}
             initialNumToRender={10}
             windowSize={10}
+            showsVerticalScrollIndicator={false}
           />
         </ListContainer>
       )}

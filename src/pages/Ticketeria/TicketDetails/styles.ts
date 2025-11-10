@@ -212,3 +212,94 @@ export const EmptyCommentsText = styled.Text`
 
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
+
+export const AttachmentsCard = styled.View`
+  border-radius: ${({ theme }) => theme.borderRadius.lg}px;
+
+  padding: ${({ theme }) => theme.spacing.lg}px;
+  margin: ${({ theme }) => theme.spacing.md}px;
+
+  background-color: ${({ theme }) => theme.colors.surface};
+
+  box-shadow: ${({ theme }) => theme.shadows.small};
+  elevation: 2;
+`;
+
+export const AttachmentsList = styled.View`
+  margin-top: ${({ theme }) => theme.spacing.md}px;
+`;
+
+export const AttachmentItem = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  padding: ${({ theme }) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+export const AttachmentLeft = styled.View`
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const AttachmentIcon = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  justify-content: center;
+  align-items: center;
+  margin-right: ${({ theme }) => theme.spacing.md}px;
+
+  background-color: ${({ theme }) => theme.colors.primaryLight};
+`;
+
+export const AttachmentInfo = styled.View`
+  flex: 1;
+`;
+
+export const AttachmentName = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
+
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
+
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+export const AttachmentMeta = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.xs}px;
+
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const AttachmentDownload = styled.TouchableOpacity`
+  width: 40px;
+  height: 40px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+
+  justify-content: center;
+  align-items: center;
+  margin-left: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.primary};
+`;
+
+export const EmptyAttachments = styled.View`
+  padding: ${({ theme }) => theme.spacing.xl}px;
+
+  align-items: center;
+`;
+
+export const EmptyAttachmentsText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.md}px;
+  text-align: center;
+
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
