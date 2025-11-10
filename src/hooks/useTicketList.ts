@@ -22,6 +22,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isOffline, setIsOffline] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const statusFilterRef = useRef(statusFilter);
   const searchTextRef = useRef(searchText);
@@ -102,18 +103,27 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
   );
 
   useEffect(() => {
-    loadTickets(1, true, true, statusFilter, searchText, false);
-  }, [statusFilter, loadTickets]);
+    if (isInitialLoad) {
+      const useCache = statusFilter === 'all' && !searchText.trim();
+      loadTickets(1, true, useCache, statusFilter, searchText, false);
+      setIsInitialLoad(false);
+    } else {
+      setTickets([]);
+      loadTickets(1, true, false, statusFilter, searchText, false);
+    }
+  }, [statusFilter, loadTickets, isInitialLoad]);
 
   useEffect(() => {
+    if (isInitialLoad) {
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
-      if (searchText.trim() || searchText === '') {
-        loadTickets(1, true, false, statusFilter, searchText, true);
-      }
+      loadTickets(1, true, false, statusFilterRef.current, searchText, true);
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchText, loadTickets]);
+  }, [searchText, loadTickets, isInitialLoad]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);

@@ -154,6 +154,7 @@ export const Body = styled.View`
   flex: 1;
 
   padding: ${({ theme }) => theme.spacing.md}px;
+  padding-bottom: 0px;
 `;
 
 export const ListContainer = styled.View`

@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { FlatList, RefreshControlProps } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import TicketCardSkeleton from '../../components/_fragments/TicketCardSkeleton';
 import {
   Body as BodyContainer,
   ListContainer,
@@ -69,7 +70,13 @@ const Body = memo(({
           </OfflineBannerText>
         </OfflineBanner>
       )}
-      {tickets.length === 0 && !loading && !searching ? (
+      {(loading || searching) && tickets.length === 0 ? (
+        <ListContainer>
+          {[1, 2, 3, 4, 5].map((index) => (
+            <TicketCardSkeleton key={index} />
+          ))}
+        </ListContainer>
+      ) : tickets.length === 0 && !loading && !searching ? (
         <EmptyContainer>
           <EmptyIcon>
             <Ionicons name="ticket-outline" size={40} color={theme.colors.textSecondary} />

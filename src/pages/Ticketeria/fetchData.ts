@@ -7,7 +7,9 @@ export const fetchTickets = async (
   useCache = true
 ): Promise<TicketListResponse> => {
   try {
-    if (useCache) {
+    const hasFilters = params?.status || params?.search;
+    
+    if (useCache && !hasFilters) {
       const cachedData = await ticketStorage.getTicketsList();
       if (cachedData) {
         return cachedData;
@@ -17,14 +19,18 @@ export const fetchTickets = async (
     const response = await TicketApi.list(params);
     
     if (response && response.data) {
-      await ticketStorage.saveTicketsList(response);
+      if (!hasFilters) {
+        await ticketStorage.saveTicketsList(response);
+      }
     }
     
     return response;
   } catch (error) {
     const cachedData = await ticketStorage.getTicketsList();
     if (cachedData && cachedData.data.length > 0) {
-      return cachedData;
+      if (!params?.status && !params?.search) {
+        return cachedData;
+      }
     }
     
     const isNetworkError = error instanceof Error && (error as any).isNetworkError;

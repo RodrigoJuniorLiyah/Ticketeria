@@ -34,9 +34,10 @@ import {
 } from './styles';
 
 import { Ticket, Comment } from '../../../types/ticket.types';
-import { theme } from '../../../styles/theme';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const TicketDetails = () => {
+  const { theme } = useTheme();
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const [ticket, setTicket] = useState<Ticket>(route.params?.ticket);

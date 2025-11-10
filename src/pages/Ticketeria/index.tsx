@@ -65,16 +65,6 @@ const TicketList = () => {
     [loading, searching, tickets.length]
   );
 
-  if (loading && tickets.length === 0) {
-    return (
-      <Container>
-        <LoadingContainer>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <LoadingText>Carregando tickets...</LoadingText>
-        </LoadingContainer>
-      </Container>
-    );
-  }
 
   return (
     <Container>
