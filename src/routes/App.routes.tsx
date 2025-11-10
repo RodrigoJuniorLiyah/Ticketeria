@@ -4,16 +4,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+import { useTheme } from '../contexts/ThemeContext';
 import TicketList from '../pages/Ticketeria';
 import CreateTicket from '../pages/Ticketeria/CreateTicket';
 import TicketDetails from '../pages/Ticketeria/TicketDetails';
-
-import { theme } from '../styles/theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TicketStack = () => {
+  const { theme } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -45,7 +46,13 @@ const TicketStack = () => {
   );
 };
 
+const ThemeToggleScreen = () => {
+  return null;
+};
+
 const AppRoutes = () => {
+  const { theme, themeMode, toggleTheme } = useTheme();
+
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -72,6 +79,26 @@ const AppRoutes = () => {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="ticket-outline" size={size} color={color} />
             ),
+          }}
+        />
+        <Tab.Screen
+          name="ThemeToggle"
+          component={ThemeToggleScreen}
+          options={{
+            tabBarLabel: themeMode === 'dark' ? 'Claro' : 'Escuro',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name={themeMode === 'dark' ? 'sunny-outline' : 'moon-outline'}
+                size={size}
+                color={color}
+              />
+            ),
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              toggleTheme();
+            },
           }}
         />
       </Tab.Navigator>

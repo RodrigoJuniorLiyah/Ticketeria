@@ -1,18 +1,19 @@
 import React, { memo } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TICKET_STATUS_FILTERS } from '../../constants/ticket.constants';
+import { useTheme } from '../../contexts/ThemeContext';
 import {
   Header as HeaderContainer,
+  HeaderTitle,
   HeaderRow,
   AddButton,
-  AddButtonText,
+  SearchContainer,
   SearchInput,
   FilterContainer,
   FilterButton,
   FilterButtonText,
 } from './styles';
-
-import { theme } from '../../styles/theme';
 
 type StatusFilter = 'all' | 'open' | 'in_progress' | 'resolved' | 'closed';
 
@@ -29,8 +30,10 @@ const FilterButtonItem = memo<{
   active: boolean;
   onPress: () => void;
 }>(({ filter, active, onPress }) => (
-  <FilterButton active={active} onPress={onPress}>
-    <FilterButtonText active={active}>{filter.label}</FilterButtonText>
+  <FilterButton active={active} filterValue={filter.value} onPress={onPress}>
+    <FilterButtonText active={active} filterValue={filter.value}>
+      {filter.label}
+    </FilterButtonText>
   </FilterButton>
 ));
 
@@ -43,17 +46,23 @@ const Header = memo(({
   onFilterChange,
   onCreateTicket,
 }: HeaderProps) => {
+  const { theme } = useTheme();
+
   return (
     <HeaderContainer>
+      <HeaderTitle>Tickets</HeaderTitle>
       <HeaderRow>
-        <SearchInput
-          placeholder="Buscar por título ou número..."
-          value={searchText}
-          onChangeText={onSearchChange}
-          placeholderTextColor={theme.colors.textSecondary}
-        />
+        <SearchContainer>
+          <Ionicons name="search-outline" size={20} color={theme.colors.textSecondary} />
+          <SearchInput
+            placeholder="Buscar tickets..."
+            value={searchText}
+            onChangeText={onSearchChange}
+            placeholderTextColor={theme.colors.textSecondary}
+          />
+        </SearchContainer>
         <AddButton onPress={onCreateTicket}>
-          <AddButtonText>+</AddButtonText>
+          <Ionicons name="add" size={24} color={theme.colors.surface} />
         </AddButton>
       </HeaderRow>
       <FilterContainer>

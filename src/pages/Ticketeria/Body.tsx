@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
-import { ActivityIndicator, FlatList } from 'react-native';
+import { FlatList, RefreshControlProps } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import TicketCard from '../../components/_fragments/TicketCard';
 import {
   Body as BodyContainer,
   ListContainer,
   EmptyContainer,
+  EmptyIcon,
   EmptyText,
-  LoadingContainer,
-  LoadingText,
+  EmptySubtext,
   OfflineBanner,
   OfflineBannerText,
 } from './styles';
@@ -25,7 +25,7 @@ interface BodyProps {
   searchText: string;
   statusFilter: string;
   refreshing: boolean;
-  refreshControl: React.ReactElement;
+  refreshControl: React.ReactElement<RefreshControlProps>;
   listFooterComponent: React.ReactElement | null;
   onTicketPress: (ticket: Ticket) => void;
   onLoadMore: () => void;
@@ -56,7 +56,6 @@ const Body = memo(({
   statusFilter,
   refreshControl,
   listFooterComponent,
-  onTicketPress,
   onLoadMore,
   renderItem,
   keyExtractor,
@@ -72,13 +71,23 @@ const Body = memo(({
       )}
       {tickets.length === 0 && !loading && !searching ? (
         <EmptyContainer>
+          <EmptyIcon>
+            <Ionicons name="ticket-outline" size={40} color={theme.colors.textSecondary} />
+          </EmptyIcon>
           <EmptyText>
             {error
-              ? error
+              ? 'Ops! Algo deu errado'
               : searchText || statusFilter !== 'all'
                 ? 'Nenhum ticket encontrado'
                 : 'Nenhum ticket cadastrado'}
           </EmptyText>
+          <EmptySubtext>
+            {error
+              ? error
+              : searchText || statusFilter !== 'all'
+                ? 'Tente ajustar os filtros ou busca'
+                : 'Comece criando seu primeiro ticket'}
+          </EmptySubtext>
         </EmptyContainer>
       ) : (
         <ListContainer>

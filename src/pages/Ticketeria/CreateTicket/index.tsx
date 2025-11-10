@@ -13,9 +13,12 @@ import PickerModal from '../../../components/_fragments/PickerModal';
 import {
   Container,
   Content,
+  FormCard,
   FormGroup,
   Label,
+  InputContainer,
   Input,
+  TextAreaContainer,
   TextArea,
   SelectContainer,
   SelectButton,
@@ -30,7 +33,7 @@ import {
 } from './styles';
 
 import { Ticket } from '../../../types/ticket.types';
-import { theme } from '../../../styles/theme';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 interface FormErrors {
   title?: string;
@@ -40,6 +43,7 @@ interface FormErrors {
 
 const CreateTicket = () => {
   const navigation = useNavigation<any>();
+  const { theme } = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -144,80 +148,86 @@ const CreateTicket = () => {
   return (
     <Container>
       <Content>
-        <FormGroup>
-          <Label>Título *</Label>
-          <Input
-            placeholder="Digite o título do ticket"
-            value={title}
-            onChangeText={(value) => handleFieldChange('title', value)}
-            placeholderTextColor={theme.colors.textSecondary}
-          />
-          {errors.title && <ErrorText>{errors.title}</ErrorText>}
-        </FormGroup>
+        <FormCard>
+          <FormGroup>
+            <Label>Título *</Label>
+            <InputContainer>
+              <Input
+                placeholder="Digite o título do ticket"
+                value={title}
+                onChangeText={(value) => handleFieldChange('title', value)}
+                placeholderTextColor={theme.colors.textSecondary}
+              />
+            </InputContainer>
+            {errors.title && <ErrorText>{errors.title}</ErrorText>}
+          </FormGroup>
 
-        <FormGroup>
-          <Label>Descrição *</Label>
-          <TextArea
-            placeholder="Descreva o problema ou solicitação (mínimo 10 caracteres)"
-            value={description}
-            onChangeText={(value) => handleFieldChange('description', value)}
-            multiline
-            numberOfLines={6}
-            placeholderTextColor={theme.colors.textSecondary}
-          />
-          {errors.description && <ErrorText>{errors.description}</ErrorText>}
-        </FormGroup>
+          <FormGroup>
+            <Label>Descrição *</Label>
+            <TextAreaContainer>
+              <TextArea
+                placeholder="Descreva o problema ou solicitação (mínimo 10 caracteres)"
+                value={description}
+                onChangeText={(value) => handleFieldChange('description', value)}
+                multiline
+                numberOfLines={6}
+                placeholderTextColor={theme.colors.textSecondary}
+              />
+            </TextAreaContainer>
+            {errors.description && <ErrorText>{errors.description}</ErrorText>}
+          </FormGroup>
 
-        <FormGroup>
-          <Label>Categoria *</Label>
-          <SelectContainer>
-            <SelectButton onPress={() => setShowCategoryPicker(true)}>
-              {category ? (
-                <SelectText>{category}</SelectText>
-              ) : (
-                <SelectPlaceholder>Selecione uma categoria</SelectPlaceholder>
-              )}
-            </SelectButton>
-          </SelectContainer>
-          {errors.category && <ErrorText>{errors.category}</ErrorText>}
+          <FormGroup>
+            <Label>Categoria *</Label>
+            <SelectContainer>
+              <SelectButton onPress={() => setShowCategoryPicker(true)}>
+                {category ? (
+                  <SelectText>{category}</SelectText>
+                ) : (
+                  <SelectPlaceholder>Selecione uma categoria</SelectPlaceholder>
+                )}
+              </SelectButton>
+            </SelectContainer>
+            {errors.category && <ErrorText>{errors.category}</ErrorText>}
 
-          <PickerModal
-            visible={showCategoryPicker}
-            selectedValue={category}
-            items={TICKET_CATEGORIES.map((cat) => ({ label: cat, value: cat }))}
-            placeholder="Selecione uma categoria"
-            onValueChange={(value) => {
-              setCategory(value);
-              handleFieldChange('category', value);
-            }}
-            onClose={() => setShowCategoryPicker(false)}
-            onConfirm={() => {
-              if (!category) {
-                setErrors((prev) => ({ ...prev, category: 'Categoria é obrigatória' }));
-              }
-            }}
-          />
-        </FormGroup>
+            <PickerModal
+              visible={showCategoryPicker}
+              selectedValue={category}
+              items={TICKET_CATEGORIES.map((cat) => ({ label: cat, value: cat }))}
+              placeholder="Selecione uma categoria"
+              onValueChange={(value) => {
+                setCategory(value);
+                handleFieldChange('category', value);
+              }}
+              onClose={() => setShowCategoryPicker(false)}
+              onConfirm={() => {
+                if (!category) {
+                  setErrors((prev) => ({ ...prev, category: 'Categoria é obrigatória' }));
+                }
+              }}
+            />
+          </FormGroup>
 
-        <FormGroup>
-          <Label>Prioridade</Label>
-          <SelectContainer>
-            <SelectButton onPress={() => setShowPriorityPicker(true)}>
-              <SelectText>
-                {TICKET_PRIORITIES.find((p) => p.value === priority)?.label || 'Média'}
-              </SelectText>
-            </SelectButton>
-          </SelectContainer>
+          <FormGroup>
+            <Label>Prioridade</Label>
+            <SelectContainer>
+              <SelectButton onPress={() => setShowPriorityPicker(true)}>
+                <SelectText>
+                  {TICKET_PRIORITIES.find((p) => p.value === priority)?.label || 'Média'}
+                </SelectText>
+              </SelectButton>
+            </SelectContainer>
 
-          <PickerModal
-            visible={showPriorityPicker}
-            selectedValue={priority}
-            items={TICKET_PRIORITIES.map((p) => ({ label: p.label, value: p.value }))}
-            placeholder="Selecione uma prioridade"
-            onValueChange={(value) => setPriority(value as Ticket['priority'])}
-            onClose={() => setShowPriorityPicker(false)}
-          />
-        </FormGroup>
+            <PickerModal
+              visible={showPriorityPicker}
+              selectedValue={priority}
+              items={TICKET_PRIORITIES.map((p) => ({ label: p.label, value: p.value }))}
+              placeholder="Selecione uma prioridade"
+              onValueChange={(value) => setPriority(value as Ticket['priority'])}
+              onClose={() => setShowPriorityPicker(false)}
+            />
+          </FormGroup>
+        </FormCard>
 
         <ButtonContainer>
           <SubmitButton disabled={!isFormValid || loading} onPress={handleSubmit}>
