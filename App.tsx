@@ -6,6 +6,7 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 import styled from 'styled-components/native';
 
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import { NetworkProvider } from './src/contexts/NetworkContext';
 import AppRoutes from './src/routes/App.routes';
 
 const GestureContainer = styled(GestureHandlerRootView)`
@@ -29,11 +30,13 @@ const AppContent = () => {
 const App = () => {
   return (
     <ThemeProvider>
-      <GestureContainer>
-        <SafeAreaProvider>
-          <AppContent />
-        </SafeAreaProvider>
-      </GestureContainer>
+      <NetworkProvider>
+        <GestureContainer>
+          <SafeAreaProvider>
+            <AppContent />
+          </SafeAreaProvider>
+        </GestureContainer>
+      </NetworkProvider>
     </ThemeProvider>
   );
 };

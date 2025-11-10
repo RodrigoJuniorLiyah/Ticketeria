@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { useTheme } from '../contexts/ThemeContext';
+import { useNetwork } from '../contexts/NetworkContext';
 import TicketList from '../pages/Ticketeria';
 import CreateTicket from '../pages/Ticketeria/CreateTicket';
 import TicketDetails from '../pages/Ticketeria/TicketDetails';
@@ -50,8 +51,13 @@ const ThemeToggleScreen = () => {
   return null;
 };
 
+const NetworkToggleScreen = () => {
+  return null;
+};
+
 const AppRoutes = () => {
   const { theme, themeMode, toggleTheme } = useTheme();
+  const { isOnline, toggleNetwork } = useNetwork();
 
   return (
     <NavigationContainer>
@@ -98,6 +104,27 @@ const AppRoutes = () => {
             tabPress: (e) => {
               e.preventDefault();
               toggleTheme();
+            },
+          }}
+        />
+        <Tab.Screen
+          name="NetworkToggle"
+          component={NetworkToggleScreen}
+          options={{
+            tabBarLabel: isOnline ? 'Online' : 'Offline',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name={isOnline ? 'cloud-outline' : 'cloud-offline-outline'}
+                size={size}
+                color={isOnline ? theme.colors.primary : theme.colors.error}
+              />
+            ),
+            tabBarActiveTintColor: isOnline ? theme.colors.primary : theme.colors.error,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              toggleNetwork();
             },
           }}
         />

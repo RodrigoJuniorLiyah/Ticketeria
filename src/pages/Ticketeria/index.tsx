@@ -1,9 +1,10 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import TicketCard from '../../components/_fragments/TicketCard';
 import { useTicketList } from '../../hooks/useTicketList';
+import { ticketStorage } from '../../helpers/ticketStorage';
 import Header from './Header';
 import Body from './Body';
 import {
@@ -13,10 +14,12 @@ import {
 } from './styles';
 
 import { Ticket } from '../../types/ticket.types';
-import { theme } from '../../styles/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const TicketList = () => {
+  const { theme } = useTheme();
   const navigation = useNavigation<any>();
+  const isFirstFocus = useRef(true);
   const {
     tickets,
     loading,
@@ -30,10 +33,12 @@ const TicketList = () => {
     handleRefresh,
     handleLoadMore,
     handleFilterChange,
+    refreshList,
   } = useTicketList();
 
   const handleTicketPress = useCallback(
-    (ticket: Ticket) => {
+    async (ticket: Ticket) => {
+      await ticketStorage.saveTicketDetails(ticket.id, ticket);
       navigation.navigate('TicketDetails', { ticket });
     },
     [navigation]
@@ -65,6 +70,19 @@ const TicketList = () => {
     [loading, searching, tickets.length]
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus.current) {
+        isFirstFocus.current = false;
+        return;
+      }
+
+      const timer = setTimeout(() => {
+        refreshList();
+      }, 100);
+      return () => clearTimeout(timer);
+    }, [refreshList])
+  );
 
   return (
     <Container>

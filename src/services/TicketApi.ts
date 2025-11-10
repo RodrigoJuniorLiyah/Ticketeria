@@ -11,6 +11,14 @@ const API_BASE_URL = 'https://api-example.com/v1';
 
 const USE_MOCK = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
+let isNetworkOnline = true;
+
+export const setNetworkMode = (online: boolean) => {
+  isNetworkOnline = online;
+};
+
+export const getNetworkMode = () => isNetworkOnline;
+
 const buildQueryString = (params: TicketListParams): string => {
   const queryParams = new URLSearchParams();
   
@@ -38,8 +46,17 @@ const handleApiResponse = async <T>(response: Response, context: string): Promis
   return response.json();
 };
 
+const simulateNetworkError = () => {
+  if (!isNetworkOnline) {
+    const error = new Error('Network request failed');
+    (error as any).isNetworkError = true;
+    throw error;
+  }
+};
+
 const TicketApiReal = {
   list: async (params?: TicketListParams): Promise<TicketListResponse> => {
+    simulateNetworkError();
     try {
       const queryString = params ? `?${buildQueryString(params)}` : '';
       const response = await fetch(`${API_BASE_URL}/tickets${queryString}`);
@@ -50,6 +67,7 @@ const TicketApiReal = {
   },
   
   getById: async (id: string | number): Promise<Ticket> => {
+    simulateNetworkError();
     try {
       const response = await fetch(`${API_BASE_URL}/tickets/${id}`);
       return handleApiResponse<Ticket>(response, 'TicketApi.getById');
@@ -59,6 +77,7 @@ const TicketApiReal = {
   },
   
   create: async (ticketData: Partial<Ticket>): Promise<Ticket> => {
+    simulateNetworkError();
     try {
       const response = await fetch(`${API_BASE_URL}/tickets`, {
         method: 'POST',
@@ -74,6 +93,7 @@ const TicketApiReal = {
   },
   
   update: async (id: string | number, ticketData: Partial<Ticket>): Promise<Ticket> => {
+    simulateNetworkError();
     try {
       const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
         method: 'PUT',
@@ -89,6 +109,7 @@ const TicketApiReal = {
   },
   
   addComment: async (id: string | number, text: string): Promise<Comment> => {
+    simulateNetworkError();
     try {
       const response = await fetch(`${API_BASE_URL}/tickets/${id}/comments`, {
         method: 'POST',
@@ -104,6 +125,7 @@ const TicketApiReal = {
   },
   
   uploadAttachment: async (id: string | number, file: unknown): Promise<unknown> => {
+    simulateNetworkError();
     try {
       const fileData = file as { uri: string; type?: string; name?: string };
       

@@ -4,18 +4,16 @@ import { TicketListParams, TicketListResponse } from '../../types/ticket.types';
 
 export const fetchTickets = async (
   params?: TicketListParams,
-  useCache = true
+  useCache = true,
+  clearCache = false
 ): Promise<TicketListResponse> => {
   try {
-    const hasFilters = params?.status || params?.search;
-    
-    if (useCache && !hasFilters) {
-      const cachedData = await ticketStorage.getTicketsList();
-      if (cachedData) {
-        return cachedData;
-      }
+    if (clearCache) {
+      await ticketStorage.clearTicketsList();
     }
 
+    const hasFilters = params?.status || params?.search;
+    
     const response = await TicketApi.list(params);
     
     if (response && response.data) {
@@ -38,6 +36,34 @@ export const fetchTickets = async (
       throw new Error('Sem conexão com a internet. Nenhum dado salvo encontrado.');
     }
     
+    throw error;
+  }
+};
+
+export const fetchTicketsWithCache = async (
+  params?: TicketListParams
+): Promise<{ cached?: TicketListResponse; fresh: TicketListResponse }> => {
+  const hasFilters = params?.status || params?.search;
+  let cached: TicketListResponse | undefined;
+
+  if (!hasFilters) {
+    cached = await ticketStorage.getTicketsList() || undefined;
+  }
+
+  try {
+    const fresh = await TicketApi.list(params);
+    
+    if (fresh && fresh.data) {
+      if (!hasFilters) {
+        await ticketStorage.saveTicketsList(fresh);
+      }
+    }
+    
+    return { cached, fresh };
+  } catch (error) {
+    if (cached) {
+      return { cached, fresh: cached };
+    }
     throw error;
   }
 };

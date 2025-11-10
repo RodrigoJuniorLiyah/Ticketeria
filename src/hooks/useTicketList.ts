@@ -24,8 +24,19 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
   const [isOffline, setIsOffline] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  useEffect(() => {
+    const loadPreferences = async () => {
+      const preferences = await ticketStorage.getUserPreferences();
+      if (preferences?.statusFilter) {
+        setStatusFilter(preferences.statusFilter as StatusFilter);
+      }
+    };
+    loadPreferences();
+  }, []);
+
   const statusFilterRef = useRef(statusFilter);
   const searchTextRef = useRef(searchText);
+  const isOfflineRef = useRef(isOffline);
 
   useEffect(() => {
     statusFilterRef.current = statusFilter;
@@ -35,17 +46,13 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
     searchTextRef.current = searchText;
   }, [searchText]);
 
-  const loadTickets = useCallback(
-    async (pageNum = 1, reset = false, useCache = true, currentStatusFilter?: StatusFilter, currentSearchText?: string, isSearch = false) => {
-      try {
-        if (reset) {
-          if (isSearch) {
-            setSearching(true);
-          } else {
-            setLoading(true);
-          }
-        }
+  useEffect(() => {
+    isOfflineRef.current = isOffline;
+  }, [isOffline]);
 
+  const loadTickets = useCallback(
+    async (pageNum = 1, reset = false, useCache = true, currentStatusFilter?: StatusFilter, currentSearchText?: string, isSearch = false, clearCache = false) => {
+      try {
         setError(null);
 
         const filter = currentStatusFilter ?? statusFilterRef.current;
@@ -65,7 +72,28 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
           params.search = search.trim();
         }
 
-        const response = await fetchTickets(params, useCache && pageNum === 1);
+        const hasFilters = filter !== 'all' || search.trim();
+
+        if (reset && useCache && !hasFilters && pageNum === 1) {
+          const cachedData = await ticketStorage.getTicketsList();
+          if (cachedData && cachedData.data.length > 0) {
+            setTickets(cachedData.data);
+            setHasMore(cachedData.page < cachedData.totalPages);
+            setPage(cachedData.page);
+            setLoading(false);
+            setSearching(false);
+          }
+        }
+
+        if (reset) {
+          if (isSearch) {
+            setSearching(true);
+          } else {
+            setLoading(true);
+          }
+        }
+
+        const response = await fetchTickets(params, false, clearCache);
 
         if (reset) {
           setTickets(response.data);
@@ -75,16 +103,37 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
 
         setHasMore(response.page < response.totalPages);
         setPage(response.page);
+        
+        const wasOffline = isOfflineRef.current;
         setIsOffline(false);
+        
+        if (wasOffline && reset && !hasFilters) {
+          setTimeout(() => {
+            loadTickets(1, true, false, currentStatusFilter ?? statusFilterRef.current, currentSearchText ?? searchTextRef.current, false, false);
+          }, 500);
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar tickets';
         const isNetworkError = err instanceof Error && (err as any).isNetworkError;
         
         const cachedData = await ticketStorage.getTicketsList();
         if (cachedData && cachedData.data.length > 0) {
-          setTickets(cachedData.data);
-          setIsOffline(true);
-          setError(isNetworkError ? null : errorMessage);
+          const filter = currentStatusFilter ?? statusFilterRef.current;
+          const search = currentSearchText ?? searchTextRef.current;
+          const hasFilters = filter !== 'all' || search.trim();
+          
+          if (!hasFilters) {
+            setTickets(cachedData.data);
+            setIsOffline(true);
+            setError(isNetworkError ? null : errorMessage);
+          } else {
+            setIsOffline(false);
+            if (isNetworkError) {
+              setError('Sem conexão com a internet e nenhum dado salvo encontrado.');
+            } else {
+              setError(errorMessage);
+            }
+          }
         } else {
           setIsOffline(false);
           if (isNetworkError) {
@@ -111,7 +160,8 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
       setTickets([]);
       loadTickets(1, true, false, statusFilter, searchText, false);
     }
-  }, [statusFilter, loadTickets, isInitialLoad]);
+  }, [statusFilter, loadTickets, isInitialLoad, searchText]);
+
 
   useEffect(() => {
     if (isInitialLoad) {
@@ -127,7 +177,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
-    loadTickets(1, true, false, statusFilterRef.current, searchTextRef.current);
+    loadTickets(1, true, false, statusFilterRef.current, searchTextRef.current, false, true);
   }, [loadTickets]);
 
   const handleLoadMore = useCallback(() => {
@@ -140,7 +190,15 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
     setStatusFilter(filter);
     setPage(1);
     setHasMore(true);
+    ticketStorage.saveUserPreferences({ statusFilter: filter });
   }, []);
+
+  const refreshList = useCallback(() => {
+    const filter = statusFilterRef.current;
+    const search = searchTextRef.current;
+    const useCache = filter === 'all' && !search.trim();
+    loadTickets(1, true, useCache, filter, search, false);
+  }, [loadTickets]);
 
   return {
     tickets,
@@ -156,6 +214,7 @@ export const useTicketList = ({ initialStatusFilter = 'all', initialSearch = '' 
     handleRefresh,
     handleLoadMore,
     handleFilterChange,
+    refreshList,
   };
 };
 

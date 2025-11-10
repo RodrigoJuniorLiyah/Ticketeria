@@ -15,7 +15,7 @@ import {
 } from './styles';
 
 import { Ticket } from '../../types/ticket.types';
-import { theme } from '../../styles/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface BodyProps {
   tickets: Ticket[];
@@ -61,6 +61,8 @@ const Body = memo(({
   renderItem,
   keyExtractor,
 }: BodyProps) => {
+  const { theme } = useTheme();
+
   return (
     <BodyContainer>
       {isOffline && tickets.length > 0 && (

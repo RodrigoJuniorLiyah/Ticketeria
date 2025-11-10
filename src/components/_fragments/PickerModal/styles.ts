@@ -1,7 +1,5 @@
 import styled from 'styled-components/native';
 
-import { theme } from '../../../styles/theme';
-
 export const ModalOverlay = styled.View`
   flex: 1;
   background-color: rgba(0, 0, 0, 0.5);
@@ -10,27 +8,27 @@ export const ModalOverlay = styled.View`
 
 export const ModalContent = styled.View`
   width: 100%;
-  background-color: ${theme.colors.surface};
-  border-top-left-radius: ${theme.borderRadius.lg};
-  border-top-right-radius: ${theme.borderRadius.lg};
+  background-color: ${({ theme }) => theme.colors.surface};
+  border-top-left-radius: ${({ theme }) => theme.borderRadius.lg}px;
+  border-top-right-radius: ${({ theme }) => theme.borderRadius.lg}px;
 `;
 
 export const ModalHeader = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: ${theme.spacing.md}px;
+  padding: ${({ theme }) => theme.spacing.md}px;
   border-bottom-width: 1px;
-  border-bottom-color: ${theme.colors.border};
+  border-bottom-color: ${({ theme }) => theme.colors.border};
 `;
 
 export const ModalButton = styled.TouchableOpacity`
-  padding: ${theme.spacing.sm}px;
+  padding: ${({ theme }) => theme.spacing.sm}px;
 `;
 
 export const ModalButtonText = styled.Text`
-  font-size: ${theme.fontSize.md};
+  font-size: ${({ theme }) => theme.fontSize.md}px;
   font-weight: 600;
-  color: ${theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
 `;
 

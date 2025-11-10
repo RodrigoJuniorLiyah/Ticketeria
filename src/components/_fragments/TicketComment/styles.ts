@@ -1,12 +1,10 @@
 import styled from 'styled-components/native';
 
-import { theme } from '../../../styles/theme';
-
 export const CommentContainer = styled.View`
   flex-direction: row;
   align-items: flex-start;
 
-  margin-bottom: ${theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
 `;
 
 export const Avatar = styled.View`
@@ -16,16 +14,16 @@ export const Avatar = styled.View`
 
   justify-content: center;
   align-items: center;
-  margin-right: ${theme.spacing.sm}px;
+  margin-right: ${({ theme }) => theme.spacing.sm}px;
 
-  background-color: ${theme.colors.primary};
+  background-color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const AvatarText = styled.Text`
-  font-size: ${theme.fontSize.sm}px;
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
   font-weight: 600;
 
-  color: ${theme.colors.surface};
+  color: ${({ theme }) => theme.colors.surface};
 `;
 
 export const CommentContent = styled.View`
@@ -36,36 +34,36 @@ export const CommentHeader = styled.View`
   flex-direction: row;
   align-items: center;
 
-  margin-bottom: ${theme.spacing.xs}px;
+  margin-bottom: ${({ theme }) => theme.spacing.xs}px;
 `;
 
 export const CommentAuthor = styled.Text`
-  font-size: ${theme.fontSize.sm}px;
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
   font-weight: 600;
 
-  margin-right: ${theme.spacing.sm}px;
+  margin-right: ${({ theme }) => theme.spacing.sm}px;
 
-  color: ${theme.colors.text};
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 export const CommentDate = styled.Text`
-  font-size: ${theme.fontSize.xs}px;
+  font-size: ${({ theme }) => theme.fontSize.xs}px;
 
-  color: ${theme.colors.textSecondary};
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 export const CommentBubble = styled.View`
-  border-radius: ${theme.borderRadius.md}px;
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
 
-  padding: ${theme.spacing.sm}px ${theme.spacing.md}px;
+  padding: ${({ theme }) => theme.spacing.sm}px ${({ theme }) => theme.spacing.md}px;
 
-  background-color: ${theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 export const CommentText = styled.Text`
-  font-size: ${theme.fontSize.sm}px;
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
   line-height: 20px;
 
-  color: ${theme.colors.text};
+  color: ${({ theme }) => theme.colors.text};
 `;
 

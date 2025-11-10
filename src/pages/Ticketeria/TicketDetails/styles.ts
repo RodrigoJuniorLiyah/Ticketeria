@@ -303,3 +303,23 @@ export const EmptyAttachmentsText = styled.Text`
 
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
+
+export const OfflineBanner = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  padding: ${({ theme }) => theme.spacing.sm}px ${({ theme }) => theme.spacing.md}px;
+  margin: ${({ theme }) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }) => theme.spacing.sm}px;
+
+  background-color: ${({ theme }) => theme.colors.warning};
+  border-radius: ${({ theme }) => theme.borderRadius.md}px;
+`;
+
+export const OfflineBannerText = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
+
+  color: ${({ theme }) => theme.colors.surface};
+`;

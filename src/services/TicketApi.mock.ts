@@ -5,6 +5,7 @@ import {
   Comment,
   Attachment,
 } from '../types/ticket.types';
+import { getNetworkMode } from './TicketApi';
 
 const MOCK_TICKETS: Ticket[] = [
   {
@@ -177,6 +178,11 @@ const sortTickets = (tickets: Ticket[], sort?: string): Ticket[] => {
 
 export const TicketApiMock = {
   list: async (params?: TicketListParams): Promise<TicketListResponse> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(500);
 
     let tickets = [...MOCK_TICKETS];
@@ -202,6 +208,11 @@ export const TicketApiMock = {
   },
 
   getById: async (id: string | number): Promise<Ticket> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(300);
 
     const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));
@@ -214,6 +225,11 @@ export const TicketApiMock = {
   },
 
   create: async (ticketData: Partial<Ticket>): Promise<Ticket> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(800);
 
     const newTicket: Ticket = {
@@ -240,6 +256,11 @@ export const TicketApiMock = {
   },
 
   update: async (id: string | number, ticketData: Partial<Ticket>): Promise<Ticket> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(500);
 
     const index = MOCK_TICKETS.findIndex((t) => String(t.id) === String(id));
@@ -261,6 +282,11 @@ export const TicketApiMock = {
   },
 
   addComment: async (id: string | number, text: string): Promise<Comment> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(400);
 
     const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));
@@ -291,6 +317,11 @@ export const TicketApiMock = {
   },
 
   uploadAttachment: async (id: string | number, file: unknown): Promise<unknown> => {
+    if (!getNetworkMode()) {
+      const error = new Error('Network request failed');
+      (error as any).isNetworkError = true;
+      throw error;
+    }
     await delay(1000);
 
     const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));

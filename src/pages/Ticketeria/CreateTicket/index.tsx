@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { pick } from '@react-native-documents/picker';
@@ -68,6 +68,7 @@ const CreateTicket = () => {
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
   const [attachments, setAttachments] = useState<Array<{ name: string; uri: string; type: string; size: number }>>([]);
+  const isPickingDocument = useRef(false);
 
   const handleFieldChange = (field: keyof FormErrors, value: string) => {
     let error: string | undefined;
@@ -90,28 +91,44 @@ const CreateTicket = () => {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handlePickDocument = async () => {
+  const handlePickDocument = useCallback(async () => {
+    if (isPickingDocument.current) {
+      return;
+    }
+
+    isPickingDocument.current = true;
+
     try {
       const results = await pick({
         allowMultiSelection: true,
       });
 
-      if (results && results.length > 0) {
-        const files = results.map((file) => ({
-          name: file.name || 'arquivo',
-          uri: file.uri,
-          type: file.type || 'application/octet-stream',
-          size: file.size || 0,
-        }));
+      if (results && Array.isArray(results) && results.length > 0) {
+        const files = results
+          .filter((file) => file && file.uri)
+          .map((file) => ({
+            name: file.name || 'arquivo',
+            uri: file.uri,
+            type: file.type || 'application/octet-stream',
+            size: file.size || 0,
+          }));
 
-        setAttachments((prev) => [...prev, ...files]);
+        if (files.length > 0) {
+          setAttachments((prev) => [...prev, ...files]);
+        }
       }
     } catch (err: any) {
-      if (err?.code !== 'DOCUMENT_PICKER_CANCELED') {
-        Alert.alert('Erro', 'Erro ao selecionar arquivo. Tente novamente.');
+      if (err?.code === 'DOCUMENT_PICKER_CANCELED' || err?.message?.includes('cancel')) {
+        isPickingDocument.current = false;
+        return;
       }
+      
+      console.error('Erro ao selecionar arquivo:', err);
+      Alert.alert('Erro', 'Erro ao selecionar arquivo. Tente novamente.');
+    } finally {
+      isPickingDocument.current = false;
     }
-  };
+  }, []);
 
   const handleRemoveAttachment = (index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
@@ -195,9 +212,16 @@ const CreateTicket = () => {
         },
       ]);
     } catch (error) {
+      const isNetworkError = error instanceof Error && (error as any).isNetworkError;
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Erro ao criar ticket. Tente novamente.';
+      
       Alert.alert(
-        'Erro',
-        error instanceof Error ? error.message : 'Erro ao criar ticket. Tente novamente.'
+        isNetworkError ? 'Sem conexão' : 'Erro',
+        isNetworkError 
+          ? 'Você está offline. Conecte-se à internet para criar um ticket.'
+          : errorMessage
       );
     } finally {
       setLoading(false);

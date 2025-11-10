@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   TICKETS_LIST: '@ticketeria:tickets_list',
   TICKET_DETAILS: '@ticketeria:ticket_details',
   FILTERS: '@ticketeria:filters',
+  USER_PREFERENCES: '@ticketeria:user_preferences',
 };
 
 export const ticketStorage = {
@@ -80,6 +81,33 @@ export const ticketStorage = {
       await AsyncStorage.removeItem(STORAGE_KEYS.TICKETS_LIST);
     } catch (error) {
       console.error('Error clearing tickets list:', error);
+    }
+  },
+
+  saveUserPreferences: async (preferences: {
+    statusFilter?: string;
+    sort?: string;
+  }): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(preferences));
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+    }
+  },
+
+  getUserPreferences: async (): Promise<{
+    statusFilter?: string;
+    sort?: string;
+  } | null> => {
+    try {
+      const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
+      if (data) {
+        return JSON.parse(data) as { statusFilter?: string; sort?: string };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting user preferences:', error);
+      return null;
     }
   },
 };

@@ -7,6 +7,7 @@ import TicketStatusBadge from '../../../components/_fragments/TicketStatusBadge'
 import TicketComment from '../../../components/_fragments/TicketComment';
 import { TicketApi } from '../../../services/TicketApi';
 import { ticketStorage } from '../../../helpers/ticketStorage';
+import { useNetwork } from '../../../contexts/NetworkContext';
 import { formatDate, getPriorityLabel, formatFileSize, getFileIcon } from '../../../utils/ticket.utils';
 import {
   Container,
@@ -41,20 +42,24 @@ import {
   AttachmentName,
   AttachmentMeta,
   AttachmentDownload,
-  EmptyAttachments,
-  EmptyAttachmentsText,
-} from './styles';
+          EmptyAttachments,
+          EmptyAttachmentsText,
+          OfflineBanner,
+          OfflineBannerText,
+        } from './styles';
 
 import { Ticket, Comment, Attachment } from '../../../types/ticket.types';
 import { useTheme } from '../../../contexts/ThemeContext';
 
 const TicketDetails = () => {
   const { theme } = useTheme();
+  const { isOnline } = useNetwork();
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
   const [ticket, setTicket] = useState<Ticket>(route.params?.ticket);
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
   const isSubmittingRef = useRef(false);
   const commentTextRef = useRef(commentText);
 
@@ -67,30 +72,64 @@ const TicketDetails = () => {
       const initialTicket = route.params?.ticket;
       if (!initialTicket?.id) return;
 
-      try {
-        const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
-        if (cachedTicket) {
-          setTicket(cachedTicket);
-        }
+      const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
+      if (cachedTicket) {
+        setTicket(cachedTicket);
+      }
 
+      if (!isOnline) {
+        setIsOffline(true);
+        if (!cachedTicket) {
+          Alert.alert(
+            'Sem conexão',
+            'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.'
+          );
+        }
+        return;
+      }
+
+      setIsOffline(false);
+
+      try {
         const fetchedTicket = await TicketApi.getById(initialTicket.id);
         setTicket(fetchedTicket);
         await ticketStorage.saveTicketDetails(fetchedTicket.id, fetchedTicket);
       } catch (error) {
-        const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
-        if (cachedTicket) {
-          setTicket(cachedTicket);
+        const isNetworkError = error instanceof Error && (error as any).isNetworkError;
+        if (isNetworkError) {
+          setIsOffline(true);
+          if (!cachedTicket) {
+            Alert.alert(
+              'Sem conexão',
+              'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.'
+            );
+          }
+        } else {
+          Alert.alert(
+            'Erro',
+            error instanceof Error ? error.message : 'Erro ao carregar detalhes do ticket'
+          );
         }
       }
     };
 
     loadTicketDetails();
-  }, [route.params?.ticket?.id]);
+  }, [route.params?.ticket?.id, isOnline]);
+
+  const ticketIdRef = useRef(ticket.id);
+  
+  React.useEffect(() => {
+    ticketIdRef.current = ticket.id;
+  }, [ticket.id]);
 
   const handleAddComment = useCallback(async () => {
+    if (isSubmittingRef.current) {
+      return;
+    }
+
     const currentText = commentTextRef.current.trim();
     
-    if (!currentText || loading || isSubmittingRef.current) {
+    if (!currentText) {
       return;
     }
 
@@ -99,13 +138,17 @@ const TicketDetails = () => {
     setCommentText('');
 
     try {
-      const newComment = await TicketApi.addComment(ticket.id, currentText);
-      const updatedTicket = {
-        ...ticket,
-        comments: [...(ticket.comments || []), newComment],
-      };
-      setTicket(updatedTicket);
-      await ticketStorage.saveTicketDetails(updatedTicket.id, updatedTicket);
+      const ticketId = ticketIdRef.current;
+      const newComment = await TicketApi.addComment(ticketId, currentText);
+      
+      setTicket((prevTicket) => {
+        const updatedTicket = {
+          ...prevTicket,
+          comments: [...(prevTicket.comments || []), newComment],
+        };
+        ticketStorage.saveTicketDetails(updatedTicket.id, updatedTicket);
+        return updatedTicket;
+      });
     } catch (error) {
       setCommentText(currentText);
       Alert.alert(
@@ -116,7 +159,7 @@ const TicketDetails = () => {
       setLoading(false);
       isSubmittingRef.current = false;
     }
-  }, [ticket.id, loading]);
+  }, []);
 
   const handleStatusChange = useCallback(
     async (newStatus: Ticket['status']) => {
@@ -148,6 +191,7 @@ const TicketDetails = () => {
       }
 
       const isMockUrl = url.includes('example.com') || url.includes('mock');
+      const isLocalUri = url.startsWith('file://') || url.startsWith('content://');
       
       if (isMockUrl) {
         Alert.alert(
@@ -155,6 +199,55 @@ const TicketDetails = () => {
           'Este é um anexo de exemplo usado para demonstração. Em produção, este anexo estaria disponível para download.',
           [{ text: 'OK' }]
         );
+        return;
+      }
+
+      if (isLocalUri) {
+        try {
+          if (Platform.OS === 'android') {
+            try {
+              const supported = await Linking.canOpenURL(url);
+              if (supported) {
+                await Linking.openURL(url);
+              } else {
+                Alert.alert(
+                  'Aviso',
+                  'Não foi possível abrir o arquivo. A URI pode ter expirado ou o arquivo não está mais disponível. Isso é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
+                  [{ text: 'OK' }]
+                );
+              }
+            } catch (canOpenError: any) {
+              const errorMsg = canOpenError?.message || '';
+              if (errorMsg.includes('not found') || errorMsg.includes('Media not found')) {
+                Alert.alert(
+                  'Aviso',
+                  'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
+                  [{ text: 'OK' }]
+                );
+              } else {
+                throw canOpenError;
+              }
+            }
+          } else {
+            await Linking.openURL(url);
+          }
+        } catch (error: any) {
+          const errorMessage = error?.message || '';
+          console.error('Erro ao abrir anexo local:', error);
+          
+          if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
+            Alert.alert(
+              'Aviso',
+              'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
+              [{ text: 'OK' }]
+            );
+          } else {
+            Alert.alert(
+              'Info',
+              'Não foi possível abrir o arquivo automaticamente. Tente usar um aplicativo de visualização de arquivos instalado no dispositivo.'
+            );
+          }
+        }
         return;
       }
 
@@ -183,38 +276,10 @@ const TicketDetails = () => {
             );
           }
         }
-      } else if (url.startsWith('file://') || url.startsWith('content://')) {
-        try {
-          if (Platform.OS === 'android') {
-            const supported = await Linking.canOpenURL(url);
-            if (supported) {
-              await Linking.openURL(url);
-            } else {
-              Alert.alert(
-                'Info',
-                'Não foi possível abrir o arquivo automaticamente. O arquivo pode ter sido movido ou a URI expirou. Tente fazer upload novamente.'
-              );
-            }
-          } else {
-            await Linking.openURL(url);
-          }
-        } catch (error: any) {
-          const errorMessage = error?.message || '';
-          if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
-            Alert.alert(
-              'Aviso',
-              'O arquivo não foi encontrado. Pode ter sido movido, removido ou a URI expirou. Tente fazer upload novamente.'
-            );
-          } else {
-            Alert.alert(
-              'Info',
-              'Não foi possível abrir o arquivo automaticamente. Tente usar um aplicativo de visualização de arquivos instalado no dispositivo.'
-            );
-          }
-        }
-      } else {
-        Alert.alert('Erro', `Tipo de URL não suportado: ${url.substring(0, 20)}...`);
+        return;
       }
+
+      Alert.alert('Erro', `Tipo de URL não suportado: ${url.substring(0, 20)}...`);
     } catch (error: any) {
       const errorMessage = error?.message || 'Erro desconhecido';
       console.error('Erro ao abrir anexo:', error);
@@ -222,7 +287,8 @@ const TicketDetails = () => {
       if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
         Alert.alert(
           'Aviso',
-          'O arquivo não foi encontrado. Pode ter sido movido, removido ou a URI expirou.'
+          'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
+          [{ text: 'OK' }]
         );
       } else {
         Alert.alert('Erro', `Não foi possível abrir o anexo: ${errorMessage}`);
@@ -238,6 +304,13 @@ const TicketDetails = () => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <Content>
+          {isOffline && (
+            <OfflineBanner>
+              <OfflineBannerText>
+                ⚠️ Modo offline - Exibindo dados salvos
+              </OfflineBannerText>
+            </OfflineBanner>
+          )}
           <HeaderCard>
             <Title>{ticket.title}</Title>
             <HeaderMeta>
