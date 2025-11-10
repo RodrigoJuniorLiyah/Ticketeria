@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import TicketList from '../pages/Ticketeria';
 import CreateTicket from '../pages/Ticketeria/CreateTicket';
@@ -68,7 +69,9 @@ const AppRoutes = () => {
           component={TicketStack}
           options={{
             tabBarLabel: 'Tickets',
-            tabBarIcon: () => null,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="ticket-outline" size={size} color={color} />
+            ),
           }}
         />
       </Tab.Navigator>
