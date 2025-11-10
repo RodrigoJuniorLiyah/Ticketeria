@@ -1,12 +1,18 @@
 import React, { memo } from 'react';
+import { Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { TICKET_STATUS_FILTERS } from '../../constants/ticket.constants';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Header as HeaderContainer,
   HeaderTitle,
   HeaderRow,
+  HeaderTopRow,
+  UserInfo,
+  UserName,
+  LogoutButton,
   AddButton,
   SearchContainer,
   SearchInput,
@@ -47,10 +53,42 @@ const Header = memo(({
   onCreateTicket,
 }: HeaderProps) => {
   const { theme } = useTheme();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair',
+      'Tem certeza que deseja sair?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+            } catch (error: any) {
+              Alert.alert('Erro', error.message || 'Erro ao fazer logout');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <HeaderContainer>
-      <HeaderTitle>Tickets</HeaderTitle>
+      <HeaderTopRow>
+        <HeaderTitle>Tickets</HeaderTitle>
+        {user && (
+          <UserInfo>
+            <UserName>{user.name}</UserName>
+            <LogoutButton onPress={handleLogout}>
+              <Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
+            </LogoutButton>
+          </UserInfo>
+        )}
+      </HeaderTopRow>
       <HeaderRow>
         <SearchContainer>
           <Ionicons name="search-outline" size={20} color={theme.colors.textSecondary} />

@@ -2,13 +2,18 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { ActivityIndicator, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import styled from 'styled-components/native';
 
 import { useTheme } from '../contexts/ThemeContext';
 import { useNetwork } from '../contexts/NetworkContext';
+import { useAuth } from '../contexts/AuthContext';
 import TicketList from '../pages/Ticketeria';
 import CreateTicket from '../pages/Ticketeria/CreateTicket';
 import TicketDetails from '../pages/Ticketeria/TicketDetails';
+import Login from '../pages/Auth/Login';
+import Register from '../pages/Auth/Register';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -55,13 +60,47 @@ const NetworkToggleScreen = () => {
   return null;
 };
 
+const LoadingContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+const AuthStack = () => {
+  const { theme } = useTheme();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Register" component={Register} />
+    </Stack.Navigator>
+  );
+};
+
 const AppRoutes = () => {
   const { theme, themeMode, toggleTheme } = useTheme();
   const { isOnline, toggleNetwork } = useNetwork();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <LoadingContainer>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </LoadingContainer>
+    );
+  }
 
   return (
     <NavigationContainer>
-      <Tab.Navigator
+      {!isAuthenticated ? (
+        <AuthStack />
+      ) : (
+        <Tab.Navigator
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: theme.colors.primary,
@@ -129,6 +168,7 @@ const AppRoutes = () => {
           }}
         />
       </Tab.Navigator>
+      )}
     </NavigationContainer>
   );
 };

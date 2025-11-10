@@ -12,6 +12,11 @@ const API_BASE_URL = 'https://api-example.com/v1';
 const USE_MOCK = typeof __DEV__ !== 'undefined' ? __DEV__ : true;
 
 let isNetworkOnline = true;
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token;
+};
 
 export const setNetworkMode = (online: boolean) => {
   isNetworkOnline = online;
@@ -29,6 +34,18 @@ const buildQueryString = (params: TicketListParams): string => {
   if (params.sort) queryParams.append('sort', params.sort);
   
   return queryParams.toString();
+};
+
+const getAuthHeaders = (): HeadersInit => {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+  
+  return headers;
 };
 
 const handleApiResponse = async <T>(response: Response, context: string): Promise<T> => {
@@ -59,7 +76,9 @@ const TicketApiReal = {
     simulateNetworkError();
     try {
       const queryString = params ? `?${buildQueryString(params)}` : '';
-      const response = await fetch(`${API_BASE_URL}/tickets${queryString}`);
+      const response = await fetch(`${API_BASE_URL}/tickets${queryString}`, {
+        headers: getAuthHeaders(),
+      });
       return handleApiResponse<TicketListResponse>(response, 'TicketApi.list');
     } catch (error) {
       throw handleWithErrorOfApi(error, 'TicketApi.list');
@@ -69,7 +88,9 @@ const TicketApiReal = {
   getById: async (id: string | number): Promise<Ticket> => {
     simulateNetworkError();
     try {
-      const response = await fetch(`${API_BASE_URL}/tickets/${id}`);
+      const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
+        headers: getAuthHeaders(),
+      });
       return handleApiResponse<Ticket>(response, 'TicketApi.getById');
     } catch (error) {
       throw handleWithErrorOfApi(error, 'TicketApi.getById');
@@ -81,9 +102,7 @@ const TicketApiReal = {
     try {
       const response = await fetch(`${API_BASE_URL}/tickets`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(ticketData),
       });
       return handleApiResponse<Ticket>(response, 'TicketApi.create');
@@ -97,9 +116,7 @@ const TicketApiReal = {
     try {
       const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(ticketData),
       });
       return handleApiResponse<Ticket>(response, 'TicketApi.update');
@@ -113,9 +130,7 @@ const TicketApiReal = {
     try {
       const response = await fetch(`${API_BASE_URL}/tickets/${id}/comments`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ text }),
       });
       return handleApiResponse<Comment>(response, 'TicketApi.addComment');
@@ -136,12 +151,18 @@ const TicketApiReal = {
         name: fileData.name || 'file',
       } as any);
 
+      const headers: HeadersInit = {
+        'Content-Type': 'multipart/form-data',
+      };
+      
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch(`${API_BASE_URL}/tickets/${id}/attachments`, {
         method: 'POST',
         body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers,
       });
       return handleApiResponse<unknown>(response, 'TicketApi.uploadAttachment');
     } catch (error) {

@@ -24,13 +24,36 @@ export const Header = styled.View`
   elevation: 2;
 `;
 
+export const HeaderTopRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: ${({ theme }) => theme.spacing.md}px;
+`;
+
 export const HeaderTitle = styled.Text`
   font-size: ${({ theme }) => theme.fontSize.xxl}px;
   font-weight: 600;
 
-  margin-bottom: ${({ theme }) => theme.spacing.md}px;
-
   color: ${({ theme }) => theme.colors.text};
+`;
+
+export const UserInfo = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm}px;
+`;
+
+export const UserName = styled.Text`
+  font-size: ${({ theme }) => theme.fontSize.sm}px;
+  font-weight: 500;
+
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+export const LogoutButton = styled.TouchableOpacity`
+  padding: ${({ theme }) => theme.spacing.xs}px;
 `;
 
 export const HeaderRow = styled.View`
