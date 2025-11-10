@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -55,7 +55,7 @@ const Header = memo(({
   const { theme } = useTheme();
   const { user, logout } = useAuth();
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     Alert.alert(
       'Sair',
       'Tem certeza que deseja sair?',
@@ -74,7 +74,7 @@ const Header = memo(({
         },
       ]
     );
-  };
+  }, [logout]);
 
   return (
     <HeaderContainer>

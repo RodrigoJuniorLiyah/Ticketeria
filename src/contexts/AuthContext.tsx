@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { AuthContextData, LoginCredentials, RegisterData, User } from '../types/auth.types';
 import { AuthApi, AuthApiMock } from '../services/AuthApi';
 import { authStorage } from '../helpers/authStorage';
@@ -9,6 +9,7 @@ import { setAuthNetworkMode } from '../services/AuthApi';
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const USE_MOCK_API = true;
+const api = USE_MOCK_API ? AuthApiMock : AuthApi;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -20,43 +21,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAuthNetworkMode(isOnline);
   }, [isOnline]);
 
+  const updateAuthState = useCallback((authData: { user: User; token: string } | null) => {
+    if (authData) {
+      setUser(authData.user);
+      setToken(authData.token);
+      setAuthToken(authData.token);
+    } else {
+      setUser(null);
+      setToken(null);
+      setAuthToken(null);
+    }
+  }, []);
+
   const saveAuthData = useCallback(async (response: { user: User; token: string }) => {
     await authStorage.saveAuth(response);
-    setUser(response.user);
-    setToken(response.token);
-    setAuthToken(response.token);
-  }, []);
+    updateAuthState(response);
+  }, [updateAuthState]);
 
   const clearAuthData = useCallback(async () => {
     await authStorage.clearAuth();
-    setUser(null);
-    setToken(null);
-    setAuthToken(null);
-  }, []);
+    updateAuthState(null);
+  }, [updateAuthState]);
 
   useEffect(() => {
     const loadAuth = async () => {
       try {
         const authData = await authStorage.getAuth();
-        if (authData) {
-          setUser(authData.user);
-          setToken(authData.token);
-          setAuthToken(authData.token);
-        }
+        updateAuthState(authData);
       } catch (error) {
         console.error('Error loading auth:', error);
+        updateAuthState(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadAuth();
-  }, []);
+  }, [updateAuthState]);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      const api = USE_MOCK_API ? AuthApiMock : AuthApi;
       const response = await api.login(credentials);
       await saveAuthData(response);
     } catch (error: any) {
@@ -69,7 +74,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = useCallback(async (data: RegisterData) => {
     try {
       setIsLoading(true);
-      const api = USE_MOCK_API ? AuthApiMock : AuthApi;
       const response = await api.register(data);
       await saveAuthData(response);
     } catch (error: any) {
@@ -81,12 +85,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      setIsLoading(true);
       await clearAuthData();
     } catch (error: any) {
       throw new Error(error.message || 'Erro ao fazer logout');
-    } finally {
-      setIsLoading(false);
     }
   }, [clearAuthData]);
 
@@ -98,16 +99,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await authStorage.saveUser(newUser);
   }, [user]);
 
-  const value: AuthContextData = {
+  const isAuthenticated = useMemo(() => !!user && !!token, [user, token]);
+
+  const value: AuthContextData = useMemo(() => ({
     user,
     token,
-    isAuthenticated: !!user && !!token,
+    isAuthenticated,
     isLoading,
     login,
     register,
     logout,
     updateUser,
-  };
+  }), [user, token, isAuthenticated, isLoading, login, register, logout, updateUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
