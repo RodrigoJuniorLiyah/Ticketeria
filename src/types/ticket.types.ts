@@ -50,4 +50,3 @@ export interface TicketListParams {
   search?: string;
   sort?: string;
 }
-

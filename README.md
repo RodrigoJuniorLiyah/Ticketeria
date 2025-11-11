@@ -9,6 +9,7 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
 ## ✨ Funcionalidades
 
 ### 🔐 Autenticação
+
 - ✅ Login e registro de usuários
 - ✅ Persistência de sessão com AsyncStorage
 - ✅ Logout com limpeza de dados
@@ -16,7 +17,9 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
 - ✅ Feedback visual de erros e sucessos
 
 ### 📋 Gestão de Tickets
+
 - ✅ **Listagem de Tickets**
+
   - Busca por título ou número
   - Filtros por status (todos, aberto, em andamento, resolvido, fechado)
   - Pull to refresh
@@ -24,6 +27,7 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
   - Cards com informações resumidas
 
 - ✅ **Criação de Tickets**
+
   - Formulário completo com validação
   - Campos: título, descrição, categoria, prioridade
   - Upload de anexos (múltiplos arquivos)
@@ -39,6 +43,7 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
   - Scroll automático ao focar no input de comentário
 
 ### 💾 Modo Offline
+
 - ✅ Cache local com AsyncStorage
 - ✅ Carregamento de dados do cache quando offline
 - ✅ SQLite para armazenamento robusto
@@ -47,6 +52,7 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
 - ✅ Sincronização quando voltar online
 
 ### 🎨 Interface e UX
+
 - ✅ Tema claro e escuro
 - ✅ Design moderno e responsivo
 - ✅ Feedback visual em todas as ações
@@ -55,6 +61,7 @@ Ticketeria é uma aplicação mobile para gerenciamento de tickets/suporte técn
 - ✅ Componentes reutilizáveis
 
 ### 🔧 Funcionalidades Técnicas
+
 - ✅ Integração com API (mock e real)
 - ✅ Tratamento de erros robusto
 - ✅ Validação de formulários
@@ -144,7 +151,8 @@ yarn clean
 
 ### Primeiro Acesso
 
-1. **Login**: 
+1. **Login**:
+
    - Email: `teste@teste.com`
    - Senha: `123456`
    - Os campos já vêm pré-preenchidos para facilitar a avaliação
@@ -322,21 +330,25 @@ yarn test --coverage
 ## 🎨 Padrões de Código
 
 ### TypeScript
+
 - Tipagem forte em todos os arquivos
 - Interfaces para todos os tipos de dados
 - Sem uso de `any` desnecessário
 
 ### Styled Components
+
 - Todos os estilos em arquivos separados (`styles.ts`)
 - Uso do tema centralizado
 - Sem estilos inline
 
 ### Componentes
+
 - Componentes funcionais com hooks
 - Uso de `memo` para otimização
 - Separação de lógica e apresentação
 
 ### Organização
+
 - Imports organizados (React → React Native → Bibliotecas → Internos)
 - Funções utilitárias separadas
 - Helpers para operações comuns
@@ -383,12 +395,14 @@ yarn clean              # Limpa node_modules, pods e gradle
 ### Problemas Comuns
 
 **Metro bundler não inicia:**
+
 ```bash
 yarn start:reset
 ```
 
 **Erro ao instalar pods (iOS):**
-   ```bash
+
+```bash
 cd ios
 pod deintegrate
 pod install
@@ -396,6 +410,7 @@ cd ..
 ```
 
 **Erro no Android:**
+
 ```bash
 cd android
 ./gradlew clean
@@ -404,6 +419,7 @@ yarn android
 ```
 
 **Cache do Metro:**
+
 ```bash
 yarn start --reset-cache
 ```
@@ -438,7 +454,7 @@ yarn start --reset-cache
     <img src="https://img.shields.io/badge/Email-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white" alt="Email"/>
   </a>
 
-  <br><br>
+<br><br>
 
   <p><strong>🌱 Atualmente aprendendo:</strong> Node.js, Python, English</p>
   <p><strong>💬 Pergunte-me sobre:</strong> JavaScript, TypeScript, CSS e React</p>

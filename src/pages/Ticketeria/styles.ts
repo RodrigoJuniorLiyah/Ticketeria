@@ -1,7 +1,5 @@
 import styled from 'styled-components/native';
 
-import { Ticket } from '../../types/ticket.types';
-
 export const Container = styled.View`
   flex: 1;
 
@@ -131,7 +129,7 @@ export const FilterButton = styled.TouchableOpacity<{ active: boolean; filterVal
     }
 
     const isDark = theme.colors.background === '#121212';
-    
+
     if (filterValue === 'all') {
       return theme.colors.primary;
     }
@@ -169,7 +167,9 @@ export const FilterButtonText = styled.Text<{ active: boolean; filterValue?: str
       return theme.colors.surface;
     }
 
-    return theme.colors.status[filterValue as keyof typeof theme.colors.status] || theme.colors.surface;
+    return (
+      theme.colors.status[filterValue as keyof typeof theme.colors.status] || theme.colors.surface
+    );
   }};
 `;
 
@@ -255,4 +255,3 @@ export const OfflineBannerText = styled.Text`
 
   color: ${({ theme }) => theme.colors.surface};
 `;
-

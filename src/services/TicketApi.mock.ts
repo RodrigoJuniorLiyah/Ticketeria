@@ -1,17 +1,12 @@
-import {
-  Ticket,
-  TicketListParams,
-  TicketListResponse,
-  Comment,
-  Attachment,
-} from '../types/ticket.types';
+import { Comment, Ticket, TicketListParams, TicketListResponse } from '../types/ticket.types';
 import { getNetworkMode } from './TicketApi';
 
 const MOCK_TICKETS: Ticket[] = [
   {
     id: 1,
     title: 'Erro ao fazer login no sistema',
-    description: 'Ao tentar fazer login, recebo uma mensagem de erro mesmo com credenciais corretas. O problema começou hoje pela manhã.',
+    description:
+      'Ao tentar fazer login, recebo uma mensagem de erro mesmo com credenciais corretas. O problema começou hoje pela manhã.',
     category: 'Bug',
     priority: 'high',
     status: 'open',
@@ -43,7 +38,8 @@ const MOCK_TICKETS: Ticket[] = [
   {
     id: 2,
     title: 'Solicitação de nova funcionalidade',
-    description: 'Gostaria de solicitar a implementação de um filtro avançado na tela de relatórios para facilitar a análise de dados.',
+    description:
+      'Gostaria de solicitar a implementação de um filtro avançado na tela de relatórios para facilitar a análise de dados.',
     category: 'Melhoria',
     priority: 'medium',
     status: 'in_progress',
@@ -79,7 +75,8 @@ const MOCK_TICKETS: Ticket[] = [
   {
     id: 3,
     title: 'Dúvida sobre configuração',
-    description: 'Preciso de ajuda para configurar as permissões de acesso do novo usuário. Não encontrei a opção no menu.',
+    description:
+      'Preciso de ajuda para configurar as permissões de acesso do novo usuário. Não encontrei a opção no menu.',
     category: 'Dúvida',
     priority: 'low',
     status: 'resolved',
@@ -107,7 +104,8 @@ const MOCK_TICKETS: Ticket[] = [
   {
     id: 4,
     title: 'Problema crítico no servidor',
-    description: 'O servidor de produção está apresentando lentidão extrema. Todos os usuários estão sendo afetados.',
+    description:
+      'O servidor de produção está apresentando lentidão extrema. Todos os usuários estão sendo afetados.',
     category: 'Bug',
     priority: 'critical',
     status: 'open',
@@ -124,7 +122,8 @@ const MOCK_TICKETS: Ticket[] = [
   {
     id: 5,
     title: 'Solicitação de treinamento',
-    description: 'Gostaria de solicitar um treinamento sobre as novas funcionalidades do sistema para minha equipe.',
+    description:
+      'Gostaria de solicitar um treinamento sobre as novas funcionalidades do sistema para minha equipe.',
     category: 'Outro',
     priority: 'low',
     status: 'closed',
@@ -142,22 +141,22 @@ const MOCK_TICKETS: Ticket[] = [
 
 let nextId = 6;
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const filterTickets = (tickets: Ticket[], params?: TicketListParams): Ticket[] => {
   let filtered = [...tickets];
 
   if (params?.status && params.status !== 'all') {
-    filtered = filtered.filter((ticket) => ticket.status === params.status);
+    filtered = filtered.filter(ticket => ticket.status === params.status);
   }
 
   if (params?.search) {
     const searchLower = params.search.toLowerCase();
     filtered = filtered.filter(
-      (ticket) =>
+      ticket =>
         ticket.title.toLowerCase().includes(searchLower) ||
         ticket.description.toLowerCase().includes(searchLower) ||
-        String(ticket.id).includes(searchLower)
+        String(ticket.id).includes(searchLower),
     );
   }
 
@@ -215,7 +214,7 @@ export const TicketApiMock = {
     }
     await delay(300);
 
-    const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));
+    const ticket = MOCK_TICKETS.find(t => String(t.id) === String(id));
 
     if (!ticket) {
       throw new Error(`Ticket com ID ${id} não encontrado`);
@@ -263,7 +262,7 @@ export const TicketApiMock = {
     }
     await delay(500);
 
-    const index = MOCK_TICKETS.findIndex((t) => String(t.id) === String(id));
+    const index = MOCK_TICKETS.findIndex(t => String(t.id) === String(id));
 
     if (index === -1) {
       throw new Error(`Ticket com ID ${id} não encontrado`);
@@ -289,7 +288,7 @@ export const TicketApiMock = {
     }
     await delay(400);
 
-    const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));
+    const ticket = MOCK_TICKETS.find(t => String(t.id) === String(id));
 
     if (!ticket) {
       throw new Error(`Ticket com ID ${id} não encontrado`);
@@ -324,14 +323,14 @@ export const TicketApiMock = {
     }
     await delay(1000);
 
-    const ticket = MOCK_TICKETS.find((t) => String(t.id) === String(id));
+    const ticket = MOCK_TICKETS.find(t => String(t.id) === String(id));
 
     if (!ticket) {
       throw new Error(`Ticket com ID ${id} não encontrado`);
     }
 
     const fileData = file as { name?: string; type?: string; size?: number; uri?: string };
-    
+
     const attachment = {
       id: Date.now(),
       name: fileData.name || 'arquivo_anexo.pdf',
@@ -350,4 +349,3 @@ export const TicketApiMock = {
     return attachment;
   },
 };
-

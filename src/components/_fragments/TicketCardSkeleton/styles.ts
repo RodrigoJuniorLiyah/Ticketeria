@@ -4,21 +4,21 @@ import { Theme } from '../../../styles/theme';
 
 const getSkeletonColor = (theme: Theme): string => {
   const isDark = theme.colors.background === '#121212';
-  
+
   if (isDark) {
     return '#2C2C2C';
   }
-  
+
   return '#E3E8EF';
 };
 
 const getSkeletonShadow = (theme: Theme): string => {
   const isDark = theme.colors.background === '#121212';
-  
+
   if (isDark) {
     return 'none';
   }
-  
+
   return '0px 1px 2px rgba(0, 0, 0, 0.05)';
 };
 
@@ -178,4 +178,3 @@ export const SkeletonAuthorText = styled.View`
   box-shadow: ${({ theme }) => getSkeletonShadow(theme)};
   elevation: ${({ theme }) => (theme.colors.background === '#121212' ? 0 : 1)};
 `;
-

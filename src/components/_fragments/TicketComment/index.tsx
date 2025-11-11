@@ -2,14 +2,14 @@ import React from 'react';
 
 import { formatDate } from '../../../utils/ticket.utils';
 import {
-  CommentContainer,
   Avatar,
   AvatarText,
-  CommentContent,
-  CommentHeader,
   CommentAuthor,
-  CommentDate,
   CommentBubble,
+  CommentContainer,
+  CommentContent,
+  CommentDate,
+  CommentHeader,
   CommentText,
 } from './styles';
 
@@ -27,25 +27,21 @@ const getInitials = (name: string): string => {
   return name.substring(0, 2).toUpperCase();
 };
 
-const TicketComment = ({ comment }: TicketCommentProps) => {
-  return (
-    <CommentContainer>
-      <Avatar>
-        <AvatarText>{getInitials(comment.createdBy.name)}</AvatarText>
-      </Avatar>
-      <CommentContent>
-        <CommentHeader>
-          <CommentAuthor>{comment.createdBy.name}</CommentAuthor>
-          <CommentDate>{formatDate(comment.createdAt)}</CommentDate>
-        </CommentHeader>
-        <CommentBubble>
-          <CommentText>{comment.text}</CommentText>
-        </CommentBubble>
-      </CommentContent>
-    </CommentContainer>
-  );
-};
+const TicketComment = ({ comment }: TicketCommentProps) => (
+  <CommentContainer>
+    <Avatar>
+      <AvatarText>{getInitials(comment.createdBy.name)}</AvatarText>
+    </Avatar>
+    <CommentContent>
+      <CommentHeader>
+        <CommentAuthor>{comment.createdBy.name}</CommentAuthor>
+        <CommentDate>{formatDate(comment.createdAt)}</CommentDate>
+      </CommentHeader>
+      <CommentBubble>
+        <CommentText>{comment.text}</CommentText>
+      </CommentBubble>
+    </CommentContent>
+  </CommentContainer>
+);
 
 export default TicketComment;
-
-

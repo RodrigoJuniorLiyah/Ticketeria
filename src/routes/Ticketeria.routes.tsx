@@ -1,8 +1,3 @@
-import React from 'react';
-
-const TicketeriaRoutes = () => {
-  return null;
-};
+const TicketeriaRoutes = () => null;
 
 export default TicketeriaRoutes;
-

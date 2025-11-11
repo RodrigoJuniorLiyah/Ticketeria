@@ -1,4 +1,4 @@
-import { LoginCredentials, RegisterData, AuthResponse } from '../types/auth.types';
+import { AuthResponse, LoginCredentials, RegisterData } from '../types/auth.types';
 
 const API_BASE_URL = 'https://api-example.com/v1';
 
@@ -96,7 +96,7 @@ export const AuthApi = {
 
 export const AuthApiMock = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     if (credentials.email === 'teste@teste.com' && credentials.password === '123456') {
       return {
@@ -114,7 +114,7 @@ export const AuthApiMock = {
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     if (data.password !== data.confirmPassword) {
       throw new Error('As senhas não coincidem');
@@ -130,13 +130,13 @@ export const AuthApiMock = {
         name: data.name,
         email: data.email,
       },
-      token: 'mock_token_' + Date.now(),
-      refreshToken: 'mock_refresh_token_' + Date.now(),
+      token: `mock_token_${Date.now()}`,
+      refreshToken: `mock_refresh_token_${Date.now()}`,
     };
   },
 
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     if (!refreshToken) {
       throw new Error('Token inválido');
@@ -148,10 +148,8 @@ export const AuthApiMock = {
         name: 'Usuário Teste',
         email: 'teste@teste.com',
       },
-      token: 'mock_token_new_' + Date.now(),
-      refreshToken: 'mock_refresh_token_new_' + Date.now(),
+      token: `mock_token_new_${Date.now()}`,
+      refreshToken: `mock_refresh_token_new_${Date.now()}`,
     };
   },
 };
-
-

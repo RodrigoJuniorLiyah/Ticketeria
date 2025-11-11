@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User, AuthResponse } from '../types/auth.types';
+import { AuthResponse, User } from '../types/auth.types';
 
 const AUTH_STORAGE_KEY = '@ticketeria:auth';
 const TOKEN_STORAGE_KEY = '@ticketeria:token';
@@ -13,11 +13,11 @@ export const authStorage = {
         [TOKEN_STORAGE_KEY, authData.token],
         [USER_STORAGE_KEY, JSON.stringify(authData.user)],
       ];
-      
+
       if (authData.refreshToken) {
         items.push([REFRESH_TOKEN_STORAGE_KEY, authData.refreshToken]);
       }
-      
+
       await AsyncStorage.multiSet(items);
     } catch (error) {
       console.error('Error saving auth:', error);
@@ -73,5 +73,3 @@ export const authStorage = {
     }
   },
 };
-
-

@@ -5,32 +5,32 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import {
-  validateEmail,
-  validatePassword,
-  validateName,
   validateConfirmPassword,
+  validateEmail,
+  validateName,
+  validatePassword,
 } from '../../../utils/validation.utils';
 import {
+  ButtonContainer,
   Container,
   Content,
-  LogoContainer,
-  LogoText,
+  ErrorText,
   FormCard,
   FormGroup,
-  Label,
+  Input,
   InputContainer,
   InputIcon,
-  Input,
-  ErrorText,
-  ButtonContainer,
-  SubmitButton,
-  SubmitButtonText,
+  Label,
   LoadingContainer,
   LoadingText,
-  LoginContainer,
-  LoginText,
   LoginButton,
   LoginButtonText,
+  LoginContainer,
+  LoginText,
+  LogoContainer,
+  LogoText,
+  SubmitButton,
+  SubmitButtonText,
 } from './styles';
 
 const Register = () => {
@@ -82,14 +82,15 @@ const Register = () => {
 
   return (
     <Container>
+      {}
+      {/* Exceção: KeyboardAvoidingView requer flex: 1 para funcionar corretamente */}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1 }}
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
+        {}
+        {/* Exceção: contentContainerStyle é propriedade específica do ScrollView */}
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
           <Content>
             <LogoContainer>
               <LogoText>🎫 Ticketeria</LogoText>
@@ -104,7 +105,7 @@ const Register = () => {
                     placeholder="Seu nome completo"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={name}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setName(text);
                       if (nameError) setNameError('');
                     }}
@@ -123,7 +124,7 @@ const Register = () => {
                     placeholder="seu@email.com"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={email}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setEmail(text);
                       if (emailError) setEmailError('');
                     }}
@@ -143,7 +144,7 @@ const Register = () => {
                     placeholder="Mínimo 6 caracteres"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={password}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setPassword(text);
                       if (passwordError) setPasswordError('');
                     }}
@@ -155,7 +156,7 @@ const Register = () => {
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={20}
                     onPress={() => setShowPassword(!showPassword)}
-                    style={{ marginRight: 0 }}
+                    noMargin
                   />
                 </InputContainer>
                 {passwordError ? <ErrorText>{passwordError}</ErrorText> : null}
@@ -169,7 +170,7 @@ const Register = () => {
                     placeholder="Digite a senha novamente"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={confirmPassword}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setConfirmPassword(text);
                       if (confirmPasswordError) setConfirmPasswordError('');
                     }}
@@ -181,7 +182,7 @@ const Register = () => {
                     name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={20}
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={{ marginRight: 0 }}
+                    noMargin
                   />
                 </InputContainer>
                 {confirmPasswordError ? <ErrorText>{confirmPasswordError}</ErrorText> : null}
@@ -215,5 +216,3 @@ const Register = () => {
 };
 
 export default Register;
-
-

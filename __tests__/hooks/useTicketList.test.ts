@@ -1,4 +1,3 @@
-import React from 'react';
 import { renderHook } from '@testing-library/react-hooks';
 import { useTicketList } from '../../src/hooks/useTicketList';
 import { fetchTickets } from '../../src/pages/Ticketeria/fetchData';
@@ -60,4 +59,3 @@ describe('useTicketList', () => {
     expect(result.current.searchText).toBe('test');
   });
 });
-

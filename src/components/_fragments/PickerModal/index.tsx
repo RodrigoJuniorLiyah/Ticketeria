@@ -3,13 +3,13 @@ import { Modal } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 import {
-  ModalOverlay,
+  ModalButton,
+  ModalButtonContainer,
+  ModalButtonText,
   ModalContent,
   ModalHandle,
   ModalHeader,
-  ModalButtonContainer,
-  ModalButton,
-  ModalButtonText,
+  ModalOverlay,
   PickerContainer,
   StyledPicker,
 } from './styles';
@@ -54,12 +54,7 @@ const PickerModal = ({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <ModalOverlay activeOpacity={1} onPress={handleOverlayPress}>
         <ModalContent>
           <ModalHandle />
@@ -76,18 +71,15 @@ const PickerModal = ({
           <PickerContainer>
             <StyledPicker
               selectedValue={selectedValue}
-              onValueChange={(value) => onValueChange(value as string)}
+              onValueChange={value => onValueChange(value as string)}
               dropdownIconColor={theme.colors.text}
-              style={{
-                color: theme.colors.text,
-              }}
             >
               <Picker.Item
                 label={placeholder}
                 value=""
                 color={themeMode === 'light' ? theme.colors.textLight : theme.colors.textSecondary}
               />
-              {items.map((item) => (
+              {items.map(item => (
                 <Picker.Item
                   key={item.value}
                   label={item.label}
@@ -104,4 +96,3 @@ const PickerModal = ({
 };
 
 export default PickerModal;
-

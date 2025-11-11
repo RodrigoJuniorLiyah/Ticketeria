@@ -4,7 +4,7 @@ import TicketCard from '../../src/components/_fragments/TicketCard';
 import { Ticket } from '../../src/types/ticket.types';
 
 jest.mock('../../src/utils/ticket.utils', () => ({
-  formatDate: (date: string) => '01/01/2024',
+  formatDate: () => '01/01/2024',
   getPriorityLabel: (priority: string) => {
     const labels: Record<string, string> = {
       low: 'Baixa',
@@ -62,9 +62,7 @@ describe('TicketCard', () => {
   it('deve renderizar card corretamente', () => {
     let tree: ReactTestRenderer.ReactTestRenderer;
     act(() => {
-      tree = ReactTestRenderer.create(
-        <TicketCard ticket={mockTicket} onPress={mockOnPress} />
-      );
+      tree = ReactTestRenderer.create(<TicketCard ticket={mockTicket} onPress={mockOnPress} />);
     });
     expect(tree!).toBeTruthy();
   });
@@ -72,9 +70,7 @@ describe('TicketCard', () => {
   it('deve renderizar título do ticket', () => {
     let tree: ReactTestRenderer.ReactTestRenderer;
     act(() => {
-      tree = ReactTestRenderer.create(
-        <TicketCard ticket={mockTicket} onPress={mockOnPress} />
-      );
+      tree = ReactTestRenderer.create(<TicketCard ticket={mockTicket} onPress={mockOnPress} />);
     });
     expect(tree!).toBeTruthy();
   });
@@ -88,7 +84,7 @@ describe('TicketCard', () => {
     let tree: ReactTestRenderer.ReactTestRenderer;
     act(() => {
       tree = ReactTestRenderer.create(
-        <TicketCard ticket={ticketWithoutAuthor} onPress={mockOnPress} />
+        <TicketCard ticket={ticketWithoutAuthor} onPress={mockOnPress} />,
       );
     });
     expect(tree!).toBeTruthy();
@@ -96,14 +92,12 @@ describe('TicketCard', () => {
 
   it('deve renderizar diferentes status', () => {
     const statuses: Ticket['status'][] = ['open', 'in_progress', 'resolved', 'closed'];
-    
-    statuses.forEach((status) => {
+
+    statuses.forEach(status => {
       const ticket = { ...mockTicket, status };
       let tree: ReactTestRenderer.ReactTestRenderer;
       act(() => {
-        tree = ReactTestRenderer.create(
-          <TicketCard ticket={ticket} onPress={mockOnPress} />
-        );
+        tree = ReactTestRenderer.create(<TicketCard ticket={ticket} onPress={mockOnPress} />);
       });
       expect(tree!).toBeTruthy();
     });
@@ -111,17 +105,14 @@ describe('TicketCard', () => {
 
   it('deve renderizar diferentes prioridades', () => {
     const priorities: Ticket['priority'][] = ['low', 'medium', 'high', 'critical'];
-    
-    priorities.forEach((priority) => {
+
+    priorities.forEach(priority => {
       const ticket = { ...mockTicket, priority };
       let tree: ReactTestRenderer.ReactTestRenderer;
       act(() => {
-        tree = ReactTestRenderer.create(
-          <TicketCard ticket={ticket} onPress={mockOnPress} />
-        );
+        tree = ReactTestRenderer.create(<TicketCard ticket={ticket} onPress={mockOnPress} />);
       });
       expect(tree!).toBeTruthy();
     });
   });
 });
-

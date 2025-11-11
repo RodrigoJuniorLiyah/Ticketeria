@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Alert, Platform, Linking, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Linking, Platform, ScrollView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -11,48 +11,53 @@ import { ticketStorage } from '../../../helpers/ticketStorage';
 import { attachmentStorage } from '../../../helpers/attachmentStorage';
 import { attachmentSync } from '../../../helpers/attachmentSync';
 import { useNetwork } from '../../../contexts/NetworkContext';
-import { formatDate, getPriorityLabel, formatFileSize, getFileIcon } from '../../../utils/ticket.utils';
 import {
-  Container,
-  Content,
-  HeaderCard,
-  Title,
-  HeaderMeta,
-  InfoCard,
-  InfoTitle,
-  InfoRow,
-  InfoLabel,
-  InfoValue,
-  DescriptionCard,
-  DescriptionText,
-  CommentsCard,
-  CommentsList,
-  ActionButtons,
+  formatDate,
+  formatFileSize,
+  getFileIcon,
+  getPriorityLabel,
+} from '../../../utils/ticket.utils';
+import {
   ActionButton,
   ActionButtonText,
-  CommentInputContainer,
-  CommentInputWrapper,
-  CommentInput,
-  SendButton,
-  EmptyComments,
-  EmptyCommentsText,
-  AttachmentsCard,
-  AttachmentsList,
-  AttachmentItem,
-  AttachmentLeft,
+  ActionButtons,
+  AttachmentDownload,
   AttachmentIcon,
   AttachmentInfo,
-  AttachmentName,
+  AttachmentItem,
+  AttachmentLeft,
   AttachmentMeta,
-  AttachmentDownload,
+  AttachmentName,
+  AttachmentsCard,
+  AttachmentsList,
+  CommentInput,
+  CommentInputContainer,
+  CommentInputWrapper,
+  CommentsCard,
+  CommentsList,
+  Container,
+  Content,
+  DescriptionCard,
+  DescriptionText,
+  EmptyComments,
+  EmptyCommentsText,
+  HeaderCard,
+  HeaderMeta,
+  InfoCard,
+  InfoLabel,
+  InfoRow,
+  InfoTitle,
+  InfoValue,
+  KeyboardAvoidingWrapper,
   OfflineBanner,
   OfflineBannerText,
-  KeyboardAvoidingWrapper,
+  SendButton,
+  Title,
 } from './styles';
 
-import { Ticket, Attachment } from '../../../types/ticket.types';
+import { Attachment, Ticket } from '../../../types/ticket.types';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { mergeTicketComments, hasDuplicateComment } from './helpers';
+import { hasDuplicateComment, mergeTicketComments } from './helpers';
 
 const TicketDetails = () => {
   const { theme } = useTheme();
@@ -88,12 +93,14 @@ const TicketDetails = () => {
 
       const cachedTicket = await ticketStorage.getTicketDetails(initialTicket.id);
       if (cachedTicket && isFirstLoad) {
-        const cachedAttachments = await attachmentStorage.getAllAttachmentsMetadata(initialTicket.id);
+        const cachedAttachments = await attachmentStorage.getAllAttachmentsMetadata(
+          initialTicket.id,
+        );
         const pendingAttachments = await attachmentStorage.getPendingAttachments(initialTicket.id);
 
         if (cachedAttachments.length > 0 || pendingAttachments.length > 0) {
           const allAttachments = [
-            ...cachedAttachments.map((meta) => ({
+            ...cachedAttachments.map(meta => ({
               id: meta.attachmentId,
               name: meta.name,
               url: meta.url || meta.localUri || '',
@@ -123,7 +130,7 @@ const TicketDetails = () => {
         if (!cachedTicket) {
           Alert.alert(
             'Sem conexão',
-            'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.'
+            'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.',
           );
         }
         return;
@@ -138,14 +145,11 @@ const TicketDetails = () => {
 
         if (fetchedTicket.attachments && fetchedTicket.attachments.length > 0) {
           for (const attachment of fetchedTicket.attachments) {
-            await attachmentStorage.saveAttachmentMetadata(
-              fetchedTicket.id,
-              attachment
-            );
+            await attachmentStorage.saveAttachmentMetadata(fetchedTicket.id, attachment);
           }
         }
 
-        setTicket((prevTicket) => {
+        setTicket(prevTicket => {
           const mergedTicket = mergeTicketComments(prevTicket, fetchedTicket);
           ticketStorage.saveTicketDetails(mergedTicket.id, mergedTicket);
           return mergedTicket;
@@ -157,13 +161,13 @@ const TicketDetails = () => {
           if (!cachedTicket) {
             Alert.alert(
               'Sem conexão',
-              'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.'
+              'Você está offline e não há dados salvos deste ticket. Conecte-se à internet para visualizar os detalhes.',
             );
           }
         } else {
           Alert.alert(
             'Erro',
-            error instanceof Error ? error.message : 'Erro ao carregar detalhes do ticket'
+            error instanceof Error ? error.message : 'Erro ao carregar detalhes do ticket',
           );
         }
       }
@@ -198,7 +202,7 @@ const TicketDetails = () => {
       const ticketId = ticketIdRef.current;
       const newComment = await TicketApi.addComment(ticketId, currentText);
 
-      setTicket((prevTicket) => {
+      setTicket(prevTicket => {
         if (hasDuplicateComment(prevTicket.comments, newComment.id)) {
           return prevTicket;
         }
@@ -212,10 +216,7 @@ const TicketDetails = () => {
       });
     } catch (error) {
       setCommentText(currentText);
-      Alert.alert(
-        'Erro',
-        error instanceof Error ? error.message : 'Erro ao adicionar comentário'
-      );
+      Alert.alert('Erro', error instanceof Error ? error.message : 'Erro ao adicionar comentário');
     } finally {
       setLoading(false);
       isSubmittingRef.current = false;
@@ -231,27 +232,27 @@ const TicketDetails = () => {
         await ticketStorage.saveTicketDetails(updatedTicket.id, updatedTicket);
         Alert.alert('Sucesso', 'Status do ticket atualizado com sucesso!');
       } catch (error) {
-        Alert.alert(
-          'Erro',
-          error instanceof Error ? error.message : 'Erro ao atualizar status'
-        );
+        Alert.alert('Erro', error instanceof Error ? error.message : 'Erro ao atualizar status');
       } finally {
         setLoading(false);
       }
     },
-    [ticket.id]
+    [ticket.id],
   );
 
   const handleCommentInputFocus = useCallback(() => {
     // iOS demora mais para abrir o teclado, precisa de timeout maior
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, Platform.OS === 'ios' ? 250 : 100);
+    setTimeout(
+      () => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      },
+      Platform.OS === 'ios' ? 250 : 100,
+    );
   }, []);
 
   const handleAttachmentPress = useCallback(async (attachment: Attachment) => {
     try {
-      const url = attachment.url;
+      const { url } = attachment;
 
       if (!url) {
         Alert.alert('Erro', 'URL do anexo não disponível.');
@@ -265,7 +266,7 @@ const TicketDetails = () => {
         Alert.alert(
           'Anexo de Demonstração',
           'Este é um anexo de exemplo usado para demonstração. Em produção, este anexo estaria disponível para download.',
-          [{ text: 'OK' }]
+          [{ text: 'OK' }],
         );
         return;
       }
@@ -281,7 +282,7 @@ const TicketDetails = () => {
                 Alert.alert(
                   'Aviso',
                   'Não foi possível abrir o arquivo. A URI pode ter expirado ou o arquivo não está mais disponível. Isso é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
-                  [{ text: 'OK' }]
+                  [{ text: 'OK' }],
                 );
               }
             } catch (canOpenError: any) {
@@ -290,7 +291,7 @@ const TicketDetails = () => {
                 Alert.alert(
                   'Aviso',
                   'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
-                  [{ text: 'OK' }]
+                  [{ text: 'OK' }],
                 );
               } else {
                 throw canOpenError;
@@ -307,12 +308,12 @@ const TicketDetails = () => {
             Alert.alert(
               'Aviso',
               'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
-              [{ text: 'OK' }]
+              [{ text: 'OK' }],
             );
           } else {
             Alert.alert(
               'Info',
-              'Não foi possível abrir o arquivo automaticamente. Tente usar um aplicativo de visualização de arquivos instalado no dispositivo.'
+              'Não foi possível abrir o arquivo automaticamente. Tente usar um aplicativo de visualização de arquivos instalado no dispositivo.',
             );
           }
         }
@@ -327,7 +328,7 @@ const TicketDetails = () => {
           } else {
             Alert.alert(
               'Erro',
-              'Não foi possível abrir este tipo de URL. Verifique se a URL está correta.'
+              'Não foi possível abrir este tipo de URL. Verifique se a URL está correta.',
             );
           }
         } catch (error: any) {
@@ -335,12 +336,12 @@ const TicketDetails = () => {
           if (errorMessage.includes('not found') || errorMessage.includes('Media not found')) {
             Alert.alert(
               'Aviso',
-              'Este anexo não está mais disponível. Pode ter sido removido ou a URL expirou.'
+              'Este anexo não está mais disponível. Pode ter sido removido ou a URL expirou.',
             );
           } else {
             Alert.alert(
               'Erro',
-              'Não foi possível abrir o anexo. Verifique sua conexão com a internet ou se a URL está acessível.'
+              'Não foi possível abrir o anexo. Verifique sua conexão com a internet ou se a URL está acessível.',
             );
           }
         }
@@ -356,7 +357,7 @@ const TicketDetails = () => {
         Alert.alert(
           'Aviso',
           'O arquivo não foi encontrado. A URI pode ter expirado, o que é comum em emuladores quando a URI temporária expira.\n\nEm produção, os arquivos seriam salvos no servidor e estariam sempre disponíveis.',
-          [{ text: 'OK' }]
+          [{ text: 'OK' }],
         );
       } else {
         Alert.alert('Erro', `Não foi possível abrir o anexo: ${errorMessage}`);
@@ -373,9 +374,7 @@ const TicketDetails = () => {
         <Content ref={scrollViewRef}>
           {isOffline && (
             <OfflineBanner>
-              <OfflineBannerText>
-                ⚠️ Modo offline - Exibindo dados salvos
-              </OfflineBannerText>
+              <OfflineBannerText>⚠️ Modo offline - Exibindo dados salvos</OfflineBannerText>
             </OfflineBanner>
           )}
           <HeaderCard>
@@ -420,7 +419,7 @@ const TicketDetails = () => {
             <AttachmentsCard>
               <InfoTitle>Anexos</InfoTitle>
               <AttachmentsList>
-                {ticket.attachments.map((attachment) => (
+                {ticket.attachments.map(attachment => (
                   <AttachmentItem
                     key={attachment.id}
                     onPress={() => handleAttachmentPress(attachment)}
@@ -437,7 +436,8 @@ const TicketDetails = () => {
                       <AttachmentInfo>
                         <AttachmentName numberOfLines={1}>{attachment.name}</AttachmentName>
                         <AttachmentMeta>
-                          {formatFileSize(attachment.size)} • {attachment.type.split('/')[1]?.toUpperCase() || 'Arquivo'}
+                          {formatFileSize(attachment.size)} •{' '}
+                          {attachment.type.split('/')[1]?.toUpperCase() || 'Arquivo'}
                         </AttachmentMeta>
                       </AttachmentInfo>
                     </AttachmentLeft>
@@ -445,11 +445,7 @@ const TicketDetails = () => {
                       onPress={() => handleAttachmentPress(attachment)}
                       activeOpacity={0.7}
                     >
-                      <Ionicons
-                        name="download-outline"
-                        size={20}
-                        color={theme.colors.surface}
-                      />
+                      <Ionicons name="download-outline" size={20} color={theme.colors.surface} />
                     </AttachmentDownload>
                   </AttachmentItem>
                 ))}
@@ -461,9 +457,7 @@ const TicketDetails = () => {
             <InfoTitle>Comentários</InfoTitle>
             <CommentsList>
               {ticket.comments && ticket.comments.length > 0 ? (
-                ticket.comments.map((comment) => (
-                  <TicketComment key={comment.id} comment={comment} />
-                ))
+                ticket.comments.map(comment => <TicketComment key={comment.id} comment={comment} />)
               ) : (
                 <EmptyComments>
                   <EmptyCommentsText>Nenhum comentário ainda</EmptyCommentsText>
@@ -508,17 +502,16 @@ const TicketDetails = () => {
               editable={!loading}
             />
           </CommentInputWrapper>
-          <SendButton
-            disabled={!commentText.trim() || loading}
-            onPress={handleAddComment}
-          >
+          <SendButton disabled={!commentText.trim() || loading} onPress={handleAddComment}>
             {loading ? (
               <ActivityIndicator size="small" color={theme.colors.surface} />
             ) : (
               <Ionicons
                 name="send"
                 size={20}
-                color={commentText.trim() && !loading ? theme.colors.surface : theme.colors.textSecondary}
+                color={
+                  commentText.trim() && !loading ? theme.colors.surface : theme.colors.textSecondary
+                }
               />
             )}
           </SendButton>

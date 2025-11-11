@@ -35,7 +35,7 @@ export const ticketStorage = {
     try {
       await AsyncStorage.setItem(
         `${STORAGE_KEYS.TICKET_DETAILS}:${ticketId}`,
-        JSON.stringify(ticket)
+        JSON.stringify(ticket),
       );
     } catch (error) {
       console.error('Error saving ticket details:', error);
@@ -111,5 +111,3 @@ export const ticketStorage = {
     }
   },
 };
-
-

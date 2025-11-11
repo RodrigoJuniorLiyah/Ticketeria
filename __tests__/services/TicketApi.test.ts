@@ -1,5 +1,5 @@
-import { TicketApi, setNetworkMode, getNetworkMode } from '../../src/services/TicketApi';
-import { Ticket, TicketListResponse, Comment } from '../../src/types/ticket.types';
+import { TicketApi, getNetworkMode, setNetworkMode } from '../../src/services/TicketApi';
+import { Comment, Ticket, TicketListResponse } from '../../src/types/ticket.types';
 
 jest.mock('../../src/services/TicketApi.mock', () => ({
   TicketApiMock: {
@@ -201,4 +201,3 @@ describe('TicketApi', () => {
     });
   });
 });
-

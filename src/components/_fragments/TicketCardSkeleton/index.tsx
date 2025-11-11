@@ -2,21 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
 import {
-  SkeletonCard,
-  SkeletonHeader,
-  SkeletonTitle,
+  SkeletonAuthor,
+  SkeletonAuthorText,
+  SkeletonAvatar,
   SkeletonBadge,
   SkeletonBody,
+  SkeletonCard,
+  SkeletonCategory,
+  SkeletonDate,
   SkeletonDescription,
   SkeletonDescriptionShort,
   SkeletonFooter,
+  SkeletonHeader,
   SkeletonMeta,
-  SkeletonCategory,
   SkeletonPriority,
-  SkeletonDate,
-  SkeletonAuthor,
-  SkeletonAvatar,
-  SkeletonAuthorText,
+  SkeletonTitle,
 } from './styles';
 
 const TicketCardSkeleton = () => {
@@ -35,13 +35,14 @@ const TicketCardSkeleton = () => {
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
     animation.start();
     return () => animation.stop();
   }, [opacity]);
 
   return (
+    // Exceção: Animated.View requer estilo inline para animações dinâmicas
     <Animated.View style={{ opacity }}>
       <SkeletonCard>
         <SkeletonHeader>
@@ -72,4 +73,3 @@ const TicketCardSkeleton = () => {
 };
 
 export default TicketCardSkeleton;
-

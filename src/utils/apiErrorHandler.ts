@@ -1,9 +1,3 @@
-interface ApiError {
-  message: string;
-  status?: number;
-  code?: string;
-}
-
 const isNetworkError = (error: unknown): boolean => {
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
@@ -33,11 +27,16 @@ export const handleWithErrorOfApi = (error: unknown, context?: string): Error =>
   }
 
   const isNetwork = isNetworkError(error);
-  
+
   let userFriendlyMessage = errorMessage;
   if (isNetwork) {
-    if (context?.includes('create') || context?.includes('addComment') || context?.includes('uploadAttachment')) {
-      userFriendlyMessage = 'Erro de conexão. Não foi possível realizar a operação. Verifique sua internet e tente novamente.';
+    if (
+      context?.includes('create') ||
+      context?.includes('addComment') ||
+      context?.includes('uploadAttachment')
+    ) {
+      userFriendlyMessage =
+        'Erro de conexão. Não foi possível realizar a operação. Verifique sua internet e tente novamente.';
     } else if (context?.includes('list') || context?.includes('getById')) {
       userFriendlyMessage = 'Erro de conexão. Verificando dados salvos...';
     } else {
@@ -69,4 +68,3 @@ export const handleWithErrorOfApi = (error: unknown, context?: string): Error =>
 
   return errorToThrow;
 };
-

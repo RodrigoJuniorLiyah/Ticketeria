@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+yarn.lock
+package-lock.json
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# Native
+android/
+ios/
+*.pbxproj
+*.xcworkspace
+
+# Metro
+.metro/
+.metro-health-check*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated files
+*.generated.*
+*.min.js
+*.min.css
+
+# Lock files (keep formatting)
+yarn.lock
+package-lock.json
+

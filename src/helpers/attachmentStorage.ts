@@ -32,7 +32,7 @@ export const attachmentStorage = {
   saveAttachmentMetadata: async (
     ticketId: string | number,
     attachment: Attachment,
-    localUri?: string
+    localUri?: string,
   ): Promise<void> => {
     try {
       const metadata: AttachmentMetadata = {
@@ -56,7 +56,7 @@ export const attachmentStorage = {
 
   getAttachmentMetadata: async (
     ticketId: string | number,
-    attachmentId: string | number
+    attachmentId: string | number,
   ): Promise<AttachmentMetadata | null> => {
     try {
       const key = `${STORAGE_KEYS.ATTACHMENTS_METADATA}:${ticketId}:${attachmentId}`;
@@ -71,13 +71,11 @@ export const attachmentStorage = {
     }
   },
 
-  getAllAttachmentsMetadata: async (
-    ticketId: string | number
-  ): Promise<AttachmentMetadata[]> => {
+  getAllAttachmentsMetadata: async (ticketId: string | number): Promise<AttachmentMetadata[]> => {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const ticketPrefix = `${STORAGE_KEYS.ATTACHMENTS_METADATA}:${ticketId}:`;
-      const ticketKeys = keys.filter((key) => key.startsWith(ticketPrefix));
+      const ticketKeys = keys.filter(key => key.startsWith(ticketPrefix));
 
       if (ticketKeys.length === 0) {
         return [];
@@ -104,7 +102,7 @@ export const attachmentStorage = {
 
   savePendingAttachment: async (
     ticketId: string | number,
-    attachment: PendingAttachment
+    attachment: PendingAttachment,
   ): Promise<void> => {
     try {
       const pending = await attachmentStorage.getPendingAttachments(ticketId);
@@ -116,9 +114,7 @@ export const attachmentStorage = {
     }
   },
 
-  getPendingAttachments: async (
-    ticketId: string | number
-  ): Promise<PendingAttachment[]> => {
+  getPendingAttachments: async (ticketId: string | number): Promise<PendingAttachment[]> => {
     try {
       const key = `${STORAGE_KEYS.PENDING_ATTACHMENTS}:${ticketId}`;
       const data = await AsyncStorage.getItem(key);
@@ -132,13 +128,10 @@ export const attachmentStorage = {
     }
   },
 
-  removePendingAttachment: async (
-    ticketId: string | number,
-    uri: string
-  ): Promise<void> => {
+  removePendingAttachment: async (ticketId: string | number, uri: string): Promise<void> => {
     try {
       const pending = await attachmentStorage.getPendingAttachments(ticketId);
-      const updated = pending.filter((att) => att.uri !== uri);
+      const updated = pending.filter(att => att.uri !== uri);
       const key = `${STORAGE_KEYS.PENDING_ATTACHMENTS}:${ticketId}`;
       if (updated.length > 0) {
         await AsyncStorage.setItem(key, JSON.stringify(updated));
@@ -163,8 +156,8 @@ export const attachmentStorage = {
     try {
       const keys = await AsyncStorage.getAllKeys();
       const ticketPrefix = `${STORAGE_KEYS.ATTACHMENTS_METADATA}:${ticketId}:`;
-      const ticketKeys = keys.filter((key) => key.startsWith(ticketPrefix));
-      
+      const ticketKeys = keys.filter(key => key.startsWith(ticketPrefix));
+
       if (ticketKeys.length > 0) {
         await AsyncStorage.multiRemove(ticketKeys);
       }
@@ -175,4 +168,3 @@ export const attachmentStorage = {
     }
   },
 };
-

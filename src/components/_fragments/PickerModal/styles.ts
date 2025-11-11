@@ -85,5 +85,5 @@ export const StyledPicker = styled(Picker)`
   width: 100%;
 
   background-color: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
 `;
-

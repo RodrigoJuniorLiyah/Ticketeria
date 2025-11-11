@@ -1,9 +1,9 @@
 import {
   formatDate,
-  getStatusLabel,
   formatFileSize,
   getFileIcon,
   getPriorityLabel,
+  getStatusLabel,
 } from '../../src/utils/ticket.utils';
 
 describe('ticket.utils', () => {
@@ -75,7 +75,9 @@ describe('ticket.utils', () => {
 
     it('deve retornar ícone correto para documentos Word', () => {
       expect(getFileIcon('application/msword')).toBe('document-outline');
-      expect(getFileIcon('application/vnd.openxmlformats-officedocument.wordprocessingml.document')).toBe('document-outline');
+      expect(
+        getFileIcon('application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+      ).toBe('document-outline');
     });
 
     it('deve retornar ícone correto para planilhas Excel', () => {
@@ -110,4 +112,3 @@ describe('ticket.utils', () => {
     });
   });
 });
-

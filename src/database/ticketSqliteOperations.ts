@@ -1,21 +1,8 @@
 export const ticketSqliteOperations = {
-  createTable: async () => {
-    return;
-  },
-  save: async (ticket: unknown) => {
-    return;
-  },
-  getAll: async () => {
-    return [];
-  },
-  getById: async (id: string | number) => {
-    return null;
-  },
-  update: async (id: string | number, data: unknown) => {
-    return;
-  },
-  delete: async (id: string | number) => {
-    return;
-  },
+  createTable: async () => {},
+  save: async (_ticket: unknown) => {},
+  getAll: async () => [],
+  getById: async (_id: string | number) => null,
+  update: async (_id: string | number, _data: unknown) => {},
+  delete: async (_id: string | number) => {},
 };
-

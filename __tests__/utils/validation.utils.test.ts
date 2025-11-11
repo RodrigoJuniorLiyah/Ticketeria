@@ -1,7 +1,7 @@
 import {
-  validateTicketTitle,
-  validateTicketDescription,
   validateTicketCategory,
+  validateTicketDescription,
+  validateTicketTitle,
 } from '../../src/utils/validation.utils';
 
 describe('validation.utils', () => {
@@ -89,4 +89,3 @@ describe('validation.utils', () => {
     });
   });
 });
-

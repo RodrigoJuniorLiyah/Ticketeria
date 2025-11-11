@@ -1,9 +1,4 @@
-import {
-  Ticket,
-  TicketListParams,
-  TicketListResponse,
-  Comment,
-} from '../types/ticket.types';
+import { Comment, Ticket, TicketListParams, TicketListResponse } from '../types/ticket.types';
 import { handleWithErrorOfApi } from '../utils/apiErrorHandler';
 import { TicketApiMock } from './TicketApi.mock';
 
@@ -27,13 +22,13 @@ export const getNetworkMode = () => isNetworkOnline;
 
 const buildQueryString = (params: TicketListParams): string => {
   const queryParams = new URLSearchParams();
-  
+
   if (params.page) queryParams.append('page', params.page.toString());
   if (params.limit) queryParams.append('limit', params.limit.toString());
   if (params.status) queryParams.append('status', params.status);
   if (params.search) queryParams.append('search', params.search);
   if (params.sort) queryParams.append('sort', params.sort);
-  
+
   return queryParams.toString();
 };
 
@@ -41,11 +36,11 @@ const getAuthHeaders = (): HeadersInit => {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
   };
-  
+
   if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
+    headers.Authorization = `Bearer ${authToken}`;
   }
-  
+
   return headers;
 };
 
@@ -57,10 +52,10 @@ const handleApiResponse = async <T>(response: Response, context: string): Promis
         message: errorData.message || `HTTP error! status: ${response.status}`,
         status: response.status,
       },
-      context
+      context,
     );
   }
-  
+
   return response.json();
 };
 
@@ -86,7 +81,7 @@ const TicketApiReal = {
       throw handleWithErrorOfApi(error, 'TicketApi.list');
     }
   },
-  
+
   getById: async (id: string | number): Promise<Ticket> => {
     simulateNetworkError();
     try {
@@ -98,7 +93,7 @@ const TicketApiReal = {
       throw handleWithErrorOfApi(error, 'TicketApi.getById');
     }
   },
-  
+
   create: async (ticketData: Partial<Ticket>): Promise<Ticket> => {
     simulateNetworkError();
     try {
@@ -112,7 +107,7 @@ const TicketApiReal = {
       throw handleWithErrorOfApi(error, 'TicketApi.create');
     }
   },
-  
+
   update: async (id: string | number, ticketData: Partial<Ticket>): Promise<Ticket> => {
     simulateNetworkError();
     try {
@@ -126,7 +121,7 @@ const TicketApiReal = {
       throw handleWithErrorOfApi(error, 'TicketApi.update');
     }
   },
-  
+
   addComment: async (id: string | number, text: string): Promise<Comment> => {
     simulateNetworkError();
     try {
@@ -140,12 +135,12 @@ const TicketApiReal = {
       throw handleWithErrorOfApi(error, 'TicketApi.addComment');
     }
   },
-  
+
   uploadAttachment: async (id: string | number, file: unknown): Promise<unknown> => {
     simulateNetworkError();
     try {
       const fileData = file as { uri: string; type?: string; name?: string };
-      
+
       const formData = new FormData();
       formData.append('file', {
         uri: fileData.uri,
@@ -156,9 +151,9 @@ const TicketApiReal = {
       const headers: HeadersInit = {
         'Content-Type': 'multipart/form-data',
       };
-      
+
       if (authToken) {
-        headers['Authorization'] = `Bearer ${authToken}`;
+        headers.Authorization = `Bearer ${authToken}`;
       }
 
       const response = await fetch(`${API_BASE_URL}/tickets/${id}/attachments`, {
@@ -174,4 +169,3 @@ const TicketApiReal = {
 };
 
 export const TicketApi = USE_MOCK ? TicketApiMock : TicketApiReal;
-

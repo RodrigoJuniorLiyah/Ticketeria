@@ -40,7 +40,10 @@ export const validateName = (name: string): ValidationResult => {
   return { isValid: true };
 };
 
-export const validateConfirmPassword = (password: string, confirmPassword: string): ValidationResult => {
+export const validateConfirmPassword = (
+  password: string,
+  confirmPassword: string,
+): ValidationResult => {
   if (!confirmPassword) {
     return { isValid: false, error: 'Confirmação de senha é obrigatória' };
   }

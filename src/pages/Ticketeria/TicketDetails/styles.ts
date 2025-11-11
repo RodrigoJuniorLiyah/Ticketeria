@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { ScrollView, KeyboardAvoidingView } from 'react-native';
+import { KeyboardAvoidingView, ScrollView } from 'react-native';
 
 export const Container = styled.View`
   flex: 1;
@@ -7,9 +7,12 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const KeyboardAvoidingWrapper = styled(KeyboardAvoidingView).attrs<{ behavior?: 'padding' | 'height' | 'position' | undefined; keyboardVerticalOffset?: number }>(({ behavior, keyboardVerticalOffset }) => ({
-  behavior: behavior,
-  keyboardVerticalOffset: keyboardVerticalOffset,
+export const KeyboardAvoidingWrapper = styled(KeyboardAvoidingView).attrs<{
+  behavior?: 'padding' | 'height' | 'position' | undefined;
+  keyboardVerticalOffset?: number;
+}>(({ behavior, keyboardVerticalOffset }) => ({
+  behavior,
+  keyboardVerticalOffset,
 }))`
   flex: 1;
 `;
@@ -18,9 +21,7 @@ export const Content = styled(ScrollView).attrs(() => ({
   keyboardShouldPersistTaps: 'handled',
   keyboardDismissMode: 'interactive',
   showsVerticalScrollIndicator: false,
-  contentContainerStyle: {
-    
-  },
+  contentContainerStyle: {},
 }))`
   flex: 1;
 `;
@@ -167,7 +168,8 @@ export const ActionButton = styled.TouchableOpacity<{ disabled?: boolean }>`
 
   padding: ${({ theme }) => theme.spacing.md}px;
 
-  background-color: ${({ disabled, theme }) => (disabled ? theme.colors.border : theme.colors.primary)};
+  background-color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.border : theme.colors.primary};
 
   box-shadow: ${({ theme }) => theme.shadows.small};
   elevation: 2;
@@ -230,7 +232,8 @@ export const SendButton = styled.TouchableOpacity<{ disabled: boolean }>`
   justify-content: center;
   align-items: center;
 
-  background-color: ${({ disabled, theme }) => (disabled ? theme.colors.border : theme.colors.primary)};
+  background-color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.border : theme.colors.primary};
 
   box-shadow: ${({ disabled, theme }) => (disabled ? 'none' : theme.shadows.small)};
   elevation: ${({ disabled }) => (disabled ? 0 : 2)};

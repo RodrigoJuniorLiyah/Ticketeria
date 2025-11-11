@@ -5,11 +5,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import TicketCardSkeleton from '../../components/_fragments/TicketCardSkeleton';
 import {
   Body as BodyContainer,
-  ListContainer,
   EmptyContainer,
   EmptyIcon,
-  EmptyText,
   EmptySubtext,
+  EmptyText,
+  ListContainer,
   OfflineBanner,
   OfflineBannerText,
 } from './styles';
@@ -47,80 +47,79 @@ const areTicketsEqual = (prev: Ticket[], next: Ticket[]): boolean => {
   });
 };
 
-const Body = memo(({
-  tickets,
-  loading,
-  searching,
-  error,
-  isOffline,
-  searchText,
-  statusFilter,
-  refreshControl,
-  listFooterComponent,
-  onLoadMore,
-  renderItem,
-  keyExtractor,
-}: BodyProps) => {
-  const { theme } = useTheme();
+const Body = memo(
+  ({
+    tickets,
+    loading,
+    searching,
+    error,
+    isOffline,
+    searchText,
+    statusFilter,
+    refreshControl,
+    listFooterComponent,
+    onLoadMore,
+    renderItem,
+    keyExtractor,
+  }: BodyProps) => {
+    const { theme } = useTheme();
 
-  return (
-    <BodyContainer>
-      {isOffline && tickets.length > 0 && (
-        <OfflineBanner>
-          <OfflineBannerText>
-            ⚠️ Modo offline - Exibindo dados salvos
-          </OfflineBannerText>
-        </OfflineBanner>
-      )}
-      {(loading || searching) && tickets.length === 0 ? (
-        <ListContainer>
-          {[1, 2, 3, 4, 5].map((index) => (
-            <TicketCardSkeleton key={index} />
-          ))}
-        </ListContainer>
-      ) : tickets.length === 0 && !loading && !searching ? (
-        <EmptyContainer>
-          <EmptyIcon>
-            <Ionicons name="ticket-outline" size={40} color={theme.colors.textSecondary} />
-          </EmptyIcon>
-          <EmptyText>
-            {error
-              ? 'Ops! Algo deu errado'
-              : searchText || statusFilter !== 'all'
+    return (
+      <BodyContainer>
+        {isOffline && tickets.length > 0 && (
+          <OfflineBanner>
+            <OfflineBannerText>⚠️ Modo offline - Exibindo dados salvos</OfflineBannerText>
+          </OfflineBanner>
+        )}
+        {(loading || searching) && tickets.length === 0 ? (
+          <ListContainer>
+            {[1, 2, 3, 4, 5].map(index => (
+              <TicketCardSkeleton key={index} />
+            ))}
+          </ListContainer>
+        ) : tickets.length === 0 && !loading && !searching ? (
+          <EmptyContainer>
+            <EmptyIcon>
+              <Ionicons name="ticket-outline" size={40} color={theme.colors.textSecondary} />
+            </EmptyIcon>
+            <EmptyText>
+              {error
+                ? 'Ops! Algo deu errado'
+                : searchText || statusFilter !== 'all'
                 ? 'Nenhum ticket encontrado'
                 : 'Nenhum ticket cadastrado'}
-          </EmptyText>
-          <EmptySubtext>
-            {error
-              ? error
-              : searchText || statusFilter !== 'all'
+            </EmptyText>
+            <EmptySubtext>
+              {error
+                ? error
+                : searchText || statusFilter !== 'all'
                 ? 'Tente ajustar os filtros ou busca'
                 : 'Comece criando seu primeiro ticket'}
-          </EmptySubtext>
-        </EmptyContainer>
-      ) : (
-        <ListContainer>
-          <FlatList<Ticket>
-            data={tickets}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            refreshControl={refreshControl}
-            onEndReached={onLoadMore}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={listFooterComponent}
-            removeClippedSubviews
-            maxToRenderPerBatch={10}
-            updateCellsBatchingPeriod={50}
-            initialNumToRender={10}
-            windowSize={10}
-            showsVerticalScrollIndicator={false}
-          />
-        </ListContainer>
-      )}
-    </BodyContainer>
-  );
-}, (prevProps, nextProps) => {
-  return (
+            </EmptySubtext>
+          </EmptyContainer>
+        ) : (
+          <ListContainer>
+            <FlatList<Ticket>
+              data={tickets}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              refreshControl={refreshControl}
+              onEndReached={onLoadMore}
+              onEndReachedThreshold={0.5}
+              ListFooterComponent={listFooterComponent}
+              removeClippedSubviews
+              maxToRenderPerBatch={10}
+              updateCellsBatchingPeriod={50}
+              initialNumToRender={10}
+              windowSize={10}
+              showsVerticalScrollIndicator={false}
+            />
+          </ListContainer>
+        )}
+      </BodyContainer>
+    );
+  },
+  (prevProps, nextProps) =>
     areTicketsEqual(prevProps.tickets, nextProps.tickets) &&
     prevProps.loading === nextProps.loading &&
     prevProps.searching === nextProps.searching &&
@@ -128,11 +127,9 @@ const Body = memo(({
     prevProps.isOffline === nextProps.isOffline &&
     prevProps.searchText === nextProps.searchText &&
     prevProps.statusFilter === nextProps.statusFilter &&
-    prevProps.refreshing === nextProps.refreshing
-  );
-});
+    prevProps.refreshing === nextProps.refreshing,
+);
 
 Body.displayName = 'TicketListBody';
 
 export default Body;
-

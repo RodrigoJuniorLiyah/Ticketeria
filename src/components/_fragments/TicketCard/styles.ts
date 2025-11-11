@@ -174,4 +174,3 @@ export const CardAuthorText = styled.Text`
 
   color: ${({ theme }) => theme.colors.textSecondary};
 `;
-

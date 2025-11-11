@@ -1,17 +1,13 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { ActivityIndicator, RefreshControl } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import TicketCard from '../../components/_fragments/TicketCard';
 import { useTicketList } from '../../hooks/useTicketList';
 import { ticketStorage } from '../../helpers/ticketStorage';
 import Header from './Header';
 import Body from './Body';
-import {
-  Container,
-  LoadingContainer,
-  LoadingText,
-} from './styles';
+import { Container, LoadingContainer } from './styles';
 
 import { Ticket } from '../../types/ticket.types';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -41,7 +37,7 @@ const TicketList = () => {
       await ticketStorage.saveTicketDetails(ticket.id, ticket);
       navigation.navigate('TicketDetails', { ticket });
     },
-    [navigation]
+    [navigation],
   );
 
   const handleCreateTicket = useCallback(() => {
@@ -50,14 +46,14 @@ const TicketList = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: Ticket }) => <TicketCard ticket={item} onPress={handleTicketPress} />,
-    [handleTicketPress]
+    [handleTicketPress],
   );
 
   const keyExtractor = useCallback((item: Ticket) => String(item.id), []);
 
   const refreshControl = useMemo(
     () => <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />,
-    [refreshing, handleRefresh]
+    [refreshing, handleRefresh],
   );
 
   const listFooterComponent = useMemo(
@@ -67,7 +63,7 @@ const TicketList = () => {
           <ActivityIndicator size="small" color={theme.colors.primary} />
         </LoadingContainer>
       ) : null,
-    [loading, searching, tickets.length]
+    [loading, searching, tickets.length, theme.colors.primary],
   );
 
   // Evita reload desnecessário na primeira vez que a tela é focada
@@ -83,7 +79,7 @@ const TicketList = () => {
         refreshList();
       }, 100);
       return () => clearTimeout(timer);
-    }, [refreshList])
+    }, [refreshList]),
   );
 
   return (
@@ -117,5 +113,3 @@ const TicketList = () => {
 };
 
 export default TicketList;
-
-

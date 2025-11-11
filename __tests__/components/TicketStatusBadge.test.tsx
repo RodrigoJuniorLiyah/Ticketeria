@@ -67,4 +67,3 @@ describe('TicketStatusBadge', () => {
     expect(tree!).toBeTruthy();
   });
 });
-

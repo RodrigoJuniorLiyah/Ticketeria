@@ -9,14 +9,10 @@ interface TicketStatusBadgeProps {
   status: Ticket['status'];
 }
 
-const TicketStatusBadge = ({ status }: TicketStatusBadgeProps) => {
-  return (
-    <Badge status={status}>
-      <BadgeText>{getStatusLabel(status)}</BadgeText>
-    </Badge>
-  );
-};
+const TicketStatusBadge = ({ status }: TicketStatusBadgeProps) => (
+  <Badge status={status}>
+    <BadgeText>{getStatusLabel(status)}</BadgeText>
+  </Badge>
+);
 
 export default TicketStatusBadge;
-
-

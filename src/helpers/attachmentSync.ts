@@ -37,7 +37,7 @@ export const attachmentSync = {
           await attachmentStorage.saveAttachmentMetadata(
             ticketId,
             uploadedAttachment as any,
-            pending.uri
+            pending.uri,
           );
 
           await attachmentStorage.removePendingAttachment(ticketId, pending.uri);
@@ -69,7 +69,7 @@ export const attachmentSync = {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
       const pendingKeys = allKeys.filter((key: string) =>
-        key.startsWith('@ticketeria:pending_attachments:')
+        key.startsWith('@ticketeria:pending_attachments:'),
       );
 
       if (pendingKeys.length === 0) {
@@ -104,4 +104,3 @@ export const attachmentSync = {
     }
   },
 };
-

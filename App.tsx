@@ -2,8 +2,7 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
-import styled from 'styled-components/native';
+import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { NetworkProvider } from './src/contexts/NetworkContext';
@@ -28,20 +27,18 @@ const AppContent = () => {
   );
 };
 
-const App = () => {
-  return (
-    <ThemeProvider>
-      <NetworkProvider>
-        <AuthProvider>
-          <GestureContainer>
-            <SafeAreaProvider>
-              <AppContent />
-            </SafeAreaProvider>
-          </GestureContainer>
-        </AuthProvider>
-      </NetworkProvider>
-    </ThemeProvider>
-  );
-};
+const App = () => (
+  <ThemeProvider>
+    <NetworkProvider>
+      <AuthProvider>
+        <GestureContainer>
+          <SafeAreaProvider>
+            <AppContent />
+          </SafeAreaProvider>
+        </GestureContainer>
+      </AuthProvider>
+    </NetworkProvider>
+  </ThemeProvider>
+);
 
 export default App;

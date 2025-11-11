@@ -1,9 +1,6 @@
-import { Ticket, Comment } from '../../../types/ticket.types';
+import { Comment, Ticket } from '../../../types/ticket.types';
 
-export const mergeTicketComments = (
-  prevTicket: Ticket,
-  fetchedTicket: Ticket
-): Ticket => {
+export const mergeTicketComments = (prevTicket: Ticket, fetchedTicket: Ticket): Ticket => {
   if (prevTicket.id !== fetchedTicket.id) {
     return fetchedTicket;
   }
@@ -22,7 +19,7 @@ export const mergeTicketComments = (
   }
 
   const newComments = (fetchedTicket.comments || []).filter(
-    c => !existingCommentIds.has(String(c.id))
+    c => !existingCommentIds.has(String(c.id)),
   );
 
   if (newComments.length > 0) {
@@ -40,9 +37,8 @@ export const mergeTicketComments = (
 
 export const hasDuplicateComment = (
   comments: Comment[] | undefined,
-  commentId: string | number
+  commentId: string | number,
 ): boolean => {
   if (!comments) return false;
   return comments.some(c => String(c.id) === String(commentId));
 };
-

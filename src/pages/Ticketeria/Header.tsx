@@ -6,19 +6,19 @@ import { TICKET_STATUS_FILTERS } from '../../constants/ticket.constants';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  Header as HeaderContainer,
-  HeaderTitle,
-  HeaderRow,
-  HeaderTopRow,
-  UserInfo,
-  UserName,
-  LogoutButton,
   AddButton,
-  SearchContainer,
-  SearchInput,
-  FilterContainer,
   FilterButton,
   FilterButtonText,
+  FilterContainer,
+  Header as HeaderContainer,
+  HeaderRow,
+  HeaderTitle,
+  HeaderTopRow,
+  LogoutButton,
+  SearchContainer,
+  SearchInput,
+  UserInfo,
+  UserName,
 } from './styles';
 
 type StatusFilter = 'all' | 'open' | 'in_progress' | 'resolved' | 'closed';
@@ -45,21 +45,13 @@ const FilterButtonItem = memo<{
 
 FilterButtonItem.displayName = 'FilterButtonItem';
 
-const Header = memo(({
-  searchText,
-  onSearchChange,
-  statusFilter,
-  onFilterChange,
-  onCreateTicket,
-}: HeaderProps) => {
-  const { theme } = useTheme();
-  const { user, logout } = useAuth();
+const Header = memo(
+  ({ searchText, onSearchChange, statusFilter, onFilterChange, onCreateTicket }: HeaderProps) => {
+    const { theme } = useTheme();
+    const { user, logout } = useAuth();
 
-  const handleLogout = useCallback(() => {
-    Alert.alert(
-      'Sair',
-      'Tem certeza que deseja sair?',
-      [
+    const handleLogout = useCallback(() => {
+      Alert.alert('Sair', 'Tem certeza que deseja sair?', [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Sair',
@@ -72,57 +64,54 @@ const Header = memo(({
             }
           },
         },
-      ]
-    );
-  }, [logout]);
+      ]);
+    }, [logout]);
 
-  return (
-    <HeaderContainer>
-      <HeaderTopRow>
-        <HeaderTitle>Tickets</HeaderTitle>
-        {user && (
-          <UserInfo>
-            <UserName>{user.name}</UserName>
-            <LogoutButton onPress={handleLogout}>
-              <Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
-            </LogoutButton>
-          </UserInfo>
-        )}
-      </HeaderTopRow>
-      <HeaderRow>
-        <SearchContainer>
-          <Ionicons name="search-outline" size={20} color={theme.colors.textSecondary} />
-          <SearchInput
-            placeholder="Buscar tickets..."
-            value={searchText}
-            onChangeText={onSearchChange}
-            placeholderTextColor={theme.colors.textSecondary}
-          />
-        </SearchContainer>
-        <AddButton onPress={onCreateTicket}>
-          <Ionicons name="add" size={24} color={theme.colors.surface} />
-        </AddButton>
-      </HeaderRow>
-      <FilterContainer>
-        {TICKET_STATUS_FILTERS.map((filter) => (
-          <FilterButtonItem
-            key={filter.value}
-            filter={filter}
-            active={statusFilter === filter.value}
-            onPress={() => onFilterChange(filter.value)}
-          />
-        ))}
-      </FilterContainer>
-    </HeaderContainer>
-  );
-}, (prevProps, nextProps) => {
-  return (
+    return (
+      <HeaderContainer>
+        <HeaderTopRow>
+          <HeaderTitle>Tickets</HeaderTitle>
+          {user && (
+            <UserInfo>
+              <UserName>{user.name}</UserName>
+              <LogoutButton onPress={handleLogout}>
+                <Ionicons name="log-out-outline" size={20} color={theme.colors.error} />
+              </LogoutButton>
+            </UserInfo>
+          )}
+        </HeaderTopRow>
+        <HeaderRow>
+          <SearchContainer>
+            <Ionicons name="search-outline" size={20} color={theme.colors.textSecondary} />
+            <SearchInput
+              placeholder="Buscar tickets..."
+              value={searchText}
+              onChangeText={onSearchChange}
+              placeholderTextColor={theme.colors.textSecondary}
+            />
+          </SearchContainer>
+          <AddButton onPress={onCreateTicket}>
+            <Ionicons name="add" size={24} color={theme.colors.surface} />
+          </AddButton>
+        </HeaderRow>
+        <FilterContainer>
+          {TICKET_STATUS_FILTERS.map(filter => (
+            <FilterButtonItem
+              key={filter.value}
+              filter={filter}
+              active={statusFilter === filter.value}
+              onPress={() => onFilterChange(filter.value)}
+            />
+          ))}
+        </FilterContainer>
+      </HeaderContainer>
+    );
+  },
+  (prevProps, nextProps) =>
     prevProps.searchText === nextProps.searchText &&
-    prevProps.statusFilter === nextProps.statusFilter
-  );
-});
+    prevProps.statusFilter === nextProps.statusFilter,
+);
 
 Header.displayName = 'TicketListHeader';
 
 export default Header;
-

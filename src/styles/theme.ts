@@ -98,4 +98,3 @@ export const darkTheme = {
 export const theme = lightTheme;
 
 export type Theme = typeof lightTheme;
-

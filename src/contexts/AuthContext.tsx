@@ -1,10 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { AuthContextData, LoginCredentials, RegisterData, User } from '../types/auth.types';
-import { AuthApi, AuthApiMock } from '../services/AuthApi';
+import { AuthApi, AuthApiMock, setAuthNetworkMode } from '../services/AuthApi';
 import { authStorage } from '../helpers/authStorage';
 import { useNetwork } from './NetworkContext';
 import { setAuthToken } from '../services/TicketApi';
-import { setAuthNetworkMode } from '../services/AuthApi';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
@@ -33,10 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const saveAuthData = useCallback(async (response: { user: User; token: string }) => {
-    await authStorage.saveAuth(response);
-    updateAuthState(response);
-  }, [updateAuthState]);
+  const saveAuthData = useCallback(
+    async (response: { user: User; token: string }) => {
+      await authStorage.saveAuth(response);
+      updateAuthState(response);
+    },
+    [updateAuthState],
+  );
 
   const clearAuthData = useCallback(async () => {
     await authStorage.clearAuth();
@@ -59,29 +69,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loadAuth();
   }, [updateAuthState]);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    try {
-      setIsLoading(true);
-      const response = await api.login(credentials);
-      await saveAuthData(response);
-    } catch (error: any) {
-      throw new Error(error.message || 'Erro ao fazer login');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [saveAuthData]);
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      try {
+        setIsLoading(true);
+        const response = await api.login(credentials);
+        await saveAuthData(response);
+      } catch (error: any) {
+        throw new Error(error.message || 'Erro ao fazer login');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [saveAuthData],
+  );
 
-  const register = useCallback(async (data: RegisterData) => {
-    try {
-      setIsLoading(true);
-      const response = await api.register(data);
-      await saveAuthData(response);
-    } catch (error: any) {
-      throw new Error(error.message || 'Erro ao criar conta');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [saveAuthData]);
+  const register = useCallback(
+    async (data: RegisterData) => {
+      try {
+        setIsLoading(true);
+        const response = await api.register(data);
+        await saveAuthData(response);
+      } catch (error: any) {
+        throw new Error(error.message || 'Erro ao criar conta');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [saveAuthData],
+  );
 
   const logout = useCallback(async () => {
     try {
@@ -91,26 +107,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [clearAuthData]);
 
-  const updateUser = useCallback(async (updatedUser: Partial<User>) => {
-    if (!user) return;
-    
-    const newUser = { ...user, ...updatedUser };
-    setUser(newUser);
-    await authStorage.saveUser(newUser);
-  }, [user]);
+  const updateUser = useCallback(
+    async (updatedUser: Partial<User>) => {
+      if (!user) return;
+
+      const newUser = { ...user, ...updatedUser };
+      setUser(newUser);
+      await authStorage.saveUser(newUser);
+    },
+    [user],
+  );
 
   const isAuthenticated = useMemo(() => !!user && !!token, [user, token]);
 
-  const value: AuthContextData = useMemo(() => ({
-    user,
-    token,
-    isAuthenticated,
-    isLoading,
-    login,
-    register,
-    logout,
-    updateUser,
-  }), [user, token, isAuthenticated, isLoading, login, register, logout, updateUser]);
+  const value: AuthContextData = useMemo(
+    () => ({
+      user,
+      token,
+      isAuthenticated,
+      isLoading,
+      login,
+      register,
+      logout,
+      updateUser,
+    }),
+    [user, token, isAuthenticated, isLoading, login, register, logout, updateUser],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -122,4 +144,3 @@ export const useAuth = (): AuthContextData => {
   }
   return context;
 };
-

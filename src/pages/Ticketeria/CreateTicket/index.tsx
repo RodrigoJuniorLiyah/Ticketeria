@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { pick } from '@react-native-documents/picker';
@@ -9,46 +9,46 @@ import { ticketStorage } from '../../../helpers/ticketStorage';
 import { attachmentStorage } from '../../../helpers/attachmentStorage';
 import { TICKET_CATEGORIES, TICKET_PRIORITIES } from '../../../constants/ticket.constants';
 import {
-  validateTicketTitle,
-  validateTicketDescription,
   validateTicketCategory,
+  validateTicketDescription,
+  validateTicketTitle,
 } from '../../../utils/validation.utils';
 import { formatFileSize, getFileIcon } from '../../../utils/ticket.utils';
 import PickerModal from '../../../components/_fragments/PickerModal';
 import {
-  Container,
-  Content,
-  FormCard,
-  FormGroup,
-  Label,
-  InputContainer,
-  Input,
-  TextAreaContainer,
-  TextArea,
-  SelectContainer,
-  SelectButton,
-  SelectLeft,
-  SelectIcon,
-  SelectText,
-  SelectPlaceholder,
-  SelectArrow,
-  ErrorText,
-  ButtonContainer,
-  SubmitButton,
-  SubmitButtonText,
-  LoadingContainer,
-  LoadingText,
-  AttachmentsContainer,
   AttachmentButton,
   AttachmentButtonText,
-  AttachmentsList,
-  AttachmentItem,
-  AttachmentInfo,
-  AttachmentIcon,
   AttachmentDetails,
+  AttachmentIcon,
+  AttachmentInfo,
+  AttachmentItem,
   AttachmentName,
-  AttachmentSize,
   AttachmentRemove,
+  AttachmentSize,
+  AttachmentsContainer,
+  AttachmentsList,
+  ButtonContainer,
+  Container,
+  Content,
+  ErrorText,
+  FormCard,
+  FormGroup,
+  Input,
+  InputContainer,
+  Label,
+  LoadingContainer,
+  LoadingText,
+  SelectArrow,
+  SelectButton,
+  SelectContainer,
+  SelectIcon,
+  SelectLeft,
+  SelectPlaceholder,
+  SelectText,
+  SubmitButton,
+  SubmitButtonText,
+  TextArea,
+  TextAreaContainer,
 } from './styles';
 
 import { Ticket, TicketListResponse } from '../../../types/ticket.types';
@@ -63,7 +63,7 @@ interface FormErrors {
 const CreateTicket = () => {
   const navigation = useNavigation<any>();
   const { theme, themeMode } = useTheme();
-  
+
   const getContrastIconColor = (isSelected: boolean) => {
     if (isSelected) return theme.colors.primary;
     return themeMode === 'light' ? '#6B7280' : theme.colors.textSecondary;
@@ -76,7 +76,9 @@ const CreateTicket = () => {
   const [loading, setLoading] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showPriorityPicker, setShowPriorityPicker] = useState(false);
-  const [attachments, setAttachments] = useState<Array<{ name: string; uri: string; type: string; size: number }>>([]);
+  const [attachments, setAttachments] = useState<
+    Array<{ name: string; uri: string; type: string; size: number }>
+  >([]);
   const isPickingDocument = useRef(false);
 
   // Validação em tempo real conforme o usuário digita
@@ -98,7 +100,7 @@ const CreateTicket = () => {
         break;
     }
 
-    setErrors((prev) => ({ ...prev, [field]: error }));
+    setErrors(prev => ({ ...prev, [field]: error }));
   };
 
   const handlePickDocument = useCallback(async () => {
@@ -116,8 +118,8 @@ const CreateTicket = () => {
 
       if (results && Array.isArray(results) && results.length > 0) {
         const files = results
-          .filter((file) => file && file.uri)
-          .map((file) => ({
+          .filter(file => file && file.uri)
+          .map(file => ({
             name: file.name || 'arquivo',
             uri: file.uri,
             type: file.type || 'application/octet-stream',
@@ -125,7 +127,7 @@ const CreateTicket = () => {
           }));
 
         if (files.length > 0) {
-          setAttachments((prev) => [...prev, ...files]);
+          setAttachments(prev => [...prev, ...files]);
         }
       }
     } catch (err: any) {
@@ -133,7 +135,7 @@ const CreateTicket = () => {
         isPickingDocument.current = false;
         return;
       }
-      
+
       console.error('Erro ao selecionar arquivo:', err);
       Alert.alert('Erro', 'Erro ao selecionar arquivo. Tente novamente.');
     } finally {
@@ -142,7 +144,7 @@ const CreateTicket = () => {
   }, []);
 
   const handleRemoveAttachment = (index: number) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   // Valida todos os campos antes de submeter
@@ -201,7 +203,7 @@ const CreateTicket = () => {
             await attachmentStorage.saveAttachmentMetadata(
               createdTicket.id,
               uploadedAttachment as any,
-              attachment.uri
+              attachment.uri,
             );
 
             uploadedAttachments.push({
@@ -228,7 +230,7 @@ const CreateTicket = () => {
         if (failedAttachments.length > 0) {
           Alert.alert(
             'Aviso',
-            `Ticket criado com sucesso, mas ${failedAttachments.length} anexo(s) não puderam ser enviados. Eles serão sincronizados quando você voltar online.`
+            `Ticket criado com sucesso, mas ${failedAttachments.length} anexo(s) não puderam ser enviados. Eles serão sincronizados quando você voltar online.`,
           );
         }
       }
@@ -264,22 +266,22 @@ const CreateTicket = () => {
       ]);
     } catch (error) {
       const isNetworkError = error instanceof Error && (error as any).isNetworkError;
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Erro ao criar ticket. Tente novamente.';
-      
+      const errorMessage =
+        error instanceof Error ? error.message : 'Erro ao criar ticket. Tente novamente.';
+
       Alert.alert(
         isNetworkError ? 'Sem conexão' : 'Erro',
-        isNetworkError 
+        isNetworkError
           ? 'Você está offline. Conecte-se à internet para criar um ticket.'
-          : errorMessage
+          : errorMessage,
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const isFormValid = title.trim().length >= 5 && description.trim().length >= 10 && category.trim().length > 0;
+  const isFormValid =
+    title.trim().length >= 5 && description.trim().length >= 10 && category.trim().length > 0;
 
   if (loading) {
     return (
@@ -302,7 +304,7 @@ const CreateTicket = () => {
               <Input
                 placeholder="Digite o título do ticket"
                 value={title}
-                onChangeText={(value) => handleFieldChange('title', value)}
+                onChangeText={value => handleFieldChange('title', value)}
                 placeholderTextColor={theme.colors.textSecondary}
               />
             </InputContainer>
@@ -315,7 +317,7 @@ const CreateTicket = () => {
               <TextArea
                 placeholder="Descreva o problema ou solicitação (mínimo 10 caracteres)"
                 value={description}
-                onChangeText={(value) => handleFieldChange('description', value)}
+                onChangeText={value => handleFieldChange('description', value)}
                 multiline
                 numberOfLines={6}
                 placeholderTextColor={theme.colors.textSecondary}
@@ -356,16 +358,16 @@ const CreateTicket = () => {
             <PickerModal
               visible={showCategoryPicker}
               selectedValue={category}
-              items={TICKET_CATEGORIES.map((cat) => ({ label: cat, value: cat }))}
+              items={TICKET_CATEGORIES.map(cat => ({ label: cat, value: cat }))}
               placeholder="Selecione uma categoria"
-              onValueChange={(value) => {
+              onValueChange={value => {
                 setCategory(value);
                 handleFieldChange('category', value);
               }}
               onClose={() => setShowCategoryPicker(false)}
               onConfirm={() => {
                 if (!category) {
-                  setErrors((prev) => ({ ...prev, category: 'Categoria é obrigatória' }));
+                  setErrors(prev => ({ ...prev, category: 'Categoria é obrigatória' }));
                 }
               }}
             />
@@ -377,14 +379,10 @@ const CreateTicket = () => {
               <SelectButton onPress={() => setShowPriorityPicker(true)} activeOpacity={0.7}>
                 <SelectLeft>
                   <SelectIcon>
-                    <Ionicons
-                      name="flag-outline"
-                      size={20}
-                      color={theme.colors.primary}
-                    />
+                    <Ionicons name="flag-outline" size={20} color={theme.colors.primary} />
                   </SelectIcon>
                   <SelectText>
-                    {TICKET_PRIORITIES.find((p) => p.value === priority)?.label || 'Média'}
+                    {TICKET_PRIORITIES.find(p => p.value === priority)?.label || 'Média'}
                   </SelectText>
                 </SelectLeft>
                 <SelectArrow>
@@ -400,9 +398,9 @@ const CreateTicket = () => {
             <PickerModal
               visible={showPriorityPicker}
               selectedValue={priority}
-              items={TICKET_PRIORITIES.map((p) => ({ label: p.label, value: p.value }))}
+              items={TICKET_PRIORITIES.map(p => ({ label: p.label, value: p.value }))}
               placeholder="Selecione uma prioridade"
-              onValueChange={(value) => setPriority(value as Ticket['priority'])}
+              onValueChange={value => setPriority(value as Ticket['priority'])}
               onClose={() => setShowPriorityPicker(false)}
             />
           </FormGroup>
@@ -464,5 +462,3 @@ const CreateTicket = () => {
 };
 
 export default CreateTicket;
-
-

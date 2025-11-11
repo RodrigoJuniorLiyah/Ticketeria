@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { setNetworkMode } from '../services/TicketApi';
@@ -44,15 +52,18 @@ export const NetworkProvider = ({ children }: { children: ReactNode }) => {
 
     if (isOnline && wasOfflineRef.current && !isSyncingRef.current) {
       isSyncingRef.current = true;
-      
-      attachmentSync.syncAllPendingAttachments().then((result) => {
-        if (result.synced > 0) {
-          console.log(`Sincronizados ${result.synced} anexo(s) pendente(s)`);
-        }
-        isSyncingRef.current = false;
-      }).catch(() => {
-        isSyncingRef.current = false;
-      });
+
+      attachmentSync
+        .syncAllPendingAttachments()
+        .then(result => {
+          if (result.synced > 0) {
+            console.log(`Sincronizados ${result.synced} anexo(s) pendente(s)`);
+          }
+          isSyncingRef.current = false;
+        })
+        .catch(() => {
+          isSyncingRef.current = false;
+        });
     }
 
     wasOfflineRef.current = !isOnline;
@@ -82,4 +93,3 @@ export const useNetwork = (): NetworkContextData => {
   }
   return context;
 };
-

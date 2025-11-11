@@ -8,7 +8,7 @@ interface BadgeProps {
 
 const getStatusBackground = (status: BadgeProps['status'], theme: Theme): string => {
   const isDark = theme.colors.background === '#121212';
-  
+
   if (isDark) {
     const backgrounds: Record<BadgeProps['status'], string> = {
       open: 'rgba(77, 122, 154, 0.3)',
@@ -18,7 +18,7 @@ const getStatusBackground = (status: BadgeProps['status'], theme: Theme): string
     };
     return backgrounds[status];
   }
-  
+
   const backgrounds: Record<BadgeProps['status'], string> = {
     open: 'rgba(42, 78, 110, 0.1)',
     in_progress: 'rgba(255, 204, 128, 0.2)',
@@ -28,9 +28,8 @@ const getStatusBackground = (status: BadgeProps['status'], theme: Theme): string
   return backgrounds[status];
 };
 
-const getStatusTextColor = (status: BadgeProps['status'], theme: Theme): string => {
-  return theme.colors.status[status];
-};
+const getStatusTextColor = (status: BadgeProps['status'], theme: Theme): string =>
+  theme.colors.status[status];
 
 export const Badge = styled.View<BadgeProps>`
   align-self: flex-start;
@@ -48,4 +47,3 @@ export const BadgeText = styled.Text<BadgeProps>`
 
   color: ${({ status, theme }) => getStatusTextColor(status, theme)};
 `;
-

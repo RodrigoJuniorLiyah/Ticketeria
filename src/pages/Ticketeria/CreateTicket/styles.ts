@@ -160,7 +160,8 @@ export const SubmitButton = styled.TouchableOpacity<{ disabled: boolean }>`
 
   padding: ${({ theme }) => theme.spacing.md}px ${({ theme }) => theme.spacing.lg}px;
 
-  background-color: ${({ disabled, theme }) => (disabled ? theme.colors.border : theme.colors.primary)};
+  background-color: ${({ disabled, theme }) =>
+    disabled ? theme.colors.border : theme.colors.primary};
 
   box-shadow: ${({ disabled, theme }) => (disabled ? 'none' : theme.shadows.small)};
   elevation: ${({ disabled }) => (disabled ? 0 : 2)};
@@ -283,4 +284,3 @@ export const AttachmentRemove = styled.TouchableOpacity`
 
   background-color: ${({ theme }) => theme.colors.error};
 `;
-

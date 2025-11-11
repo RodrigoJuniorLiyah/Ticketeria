@@ -48,15 +48,14 @@ export const InputContainer = styled.View<{ hasError?: boolean }>`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.background};
   border-width: 1.5px;
-  border-color: ${({ theme, hasError }) =>
-    hasError ? theme.colors.error : theme.colors.border};
+  border-color: ${({ theme, hasError }) => (hasError ? theme.colors.error : theme.colors.border)};
   border-radius: ${({ theme }) => theme.borderRadius.md}px;
   padding: ${({ theme }) => theme.spacing.md}px;
 `;
 
-export const InputIcon = styled(Ionicons)<{ onPress?: () => void }>`
+export const InputIcon = styled(Ionicons)<{ onPress?: () => void; noMargin?: boolean }>`
   color: ${({ theme }) => theme.colors.textSecondary};
-  margin-right: ${({ theme }) => theme.spacing.sm}px;
+  margin-right: ${({ theme, noMargin }) => (noMargin ? 0 : theme.spacing.sm)}px;
 `;
 
 export const Input = styled(TextInput)`
@@ -123,5 +122,3 @@ export const LoginButtonText = styled.Text`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.primary};
 `;
-
-

@@ -5,28 +5,28 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { validateEmail, validatePassword } from '../../../utils/validation.utils';
 import {
+  ButtonContainer,
   Container,
-  KeyboardAvoidingContainer,
-  ScrollContent,
   Content,
-  LogoContainer,
-  LogoText,
+  ErrorText,
   FormCard,
   FormGroup,
-  Label,
+  Input,
   InputContainer,
   InputIcon,
-  Input,
-  ErrorText,
-  ButtonContainer,
-  SubmitButton,
-  SubmitButtonText,
+  KeyboardAvoidingContainer,
+  Label,
   LoadingContainer,
   LoadingText,
-  RegisterContainer,
-  RegisterText,
+  LogoContainer,
+  LogoText,
   RegisterButton,
   RegisterButtonText,
+  RegisterContainer,
+  RegisterText,
+  ScrollContent,
+  SubmitButton,
+  SubmitButtonText,
 } from './styles';
 
 const Login = () => {
@@ -80,7 +80,7 @@ const Login = () => {
                     placeholder="seu@email.com"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={email}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setEmail(text);
                       if (emailError) setEmailError('');
                     }}
@@ -100,7 +100,7 @@ const Login = () => {
                     placeholder="Sua senha"
                     placeholderTextColor={theme.colors.textSecondary}
                     value={password}
-                    onChangeText={(text) => {
+                    onChangeText={text => {
                       setPassword(text);
                       if (passwordError) setPasswordError('');
                     }}
@@ -146,5 +146,3 @@ const Login = () => {
 };
 
 export default Login;
-
-

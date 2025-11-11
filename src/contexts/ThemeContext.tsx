@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { ReactNode, createContext, useCallback, useContext, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { theme as lightTheme, darkTheme, Theme } from '../styles/theme';
+import { Theme, darkTheme, theme as lightTheme } from '../styles/theme';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -59,4 +59,3 @@ export const useTheme = (): ThemeContextData => {
   }
   return context;
 };
-

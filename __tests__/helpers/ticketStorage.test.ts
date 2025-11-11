@@ -27,7 +27,7 @@ describe('ticketStorage', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         '@ticketeria:tickets_list',
-        JSON.stringify(mockData)
+        JSON.stringify(mockData),
       );
     });
 
@@ -105,7 +105,7 @@ describe('ticketStorage', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         '@ticketeria:ticket_details:1',
-        JSON.stringify(mockTicket)
+        JSON.stringify(mockTicket),
       );
     });
   });
@@ -159,7 +159,7 @@ describe('ticketStorage', () => {
 
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         '@ticketeria:user_preferences',
-        JSON.stringify(preferences)
+        JSON.stringify(preferences),
       );
     });
   });
@@ -187,4 +187,3 @@ describe('ticketStorage', () => {
     });
   });
 });
-

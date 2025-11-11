@@ -66,4 +66,3 @@ export const CommentText = styled.Text`
 
   color: ${({ theme }) => theme.colors.text};
 `;
-

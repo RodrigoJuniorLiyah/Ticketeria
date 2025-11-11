@@ -1,5 +1,11 @@
 import styled from 'styled-components/native';
-import { TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export const Container = styled.SafeAreaView`
@@ -61,8 +67,7 @@ export const InputContainer = styled.View<{ hasError?: boolean }>`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.background};
   border-width: 1.5px;
-  border-color: ${({ theme, hasError }) =>
-    hasError ? theme.colors.error : theme.colors.border};
+  border-color: ${({ theme, hasError }) => (hasError ? theme.colors.error : theme.colors.border)};
   border-radius: ${({ theme }) => theme.borderRadius.md}px;
   padding: ${({ theme }) => theme.spacing.md}px;
 `;
@@ -136,5 +141,3 @@ export const RegisterButtonText = styled.Text`
   font-weight: 600;
   color: ${({ theme }) => theme.colors.primary};
 `;
-
-

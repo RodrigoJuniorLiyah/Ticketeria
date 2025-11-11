@@ -1,12 +1,6 @@
 import { Ticket } from '../types/ticket.types';
 
-export const TICKET_CATEGORIES = [
-  'Suporte Técnico',
-  'Bug',
-  'Melhoria',
-  'Dúvida',
-  'Outro',
-] as const;
+export const TICKET_CATEGORIES = ['Suporte Técnico', 'Bug', 'Melhoria', 'Dúvida', 'Outro'] as const;
 
 export const TICKET_PRIORITIES: { label: string; value: Ticket['priority'] }[] = [
   { label: 'Baixa', value: 'low' },
@@ -36,4 +30,3 @@ export const TICKET_VALIDATION_RULES = {
     required: true,
   },
 } as const;
-

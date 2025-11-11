@@ -41,8 +41,16 @@ const TicketStack = () => {
   return (
     <Stack.Navigator screenOptions={screenOptions}>
       <Stack.Screen name="TicketList" component={TicketList} options={{ title: 'Tickets' }} />
-      <Stack.Screen name="CreateTicket" component={CreateTicket} options={{ title: 'Novo Ticket' }} />
-      <Stack.Screen name="TicketDetails" component={TicketDetails} options={{ title: 'Detalhes do Ticket' }} />
+      <Stack.Screen
+        name="CreateTicket"
+        component={CreateTicket}
+        options={{ title: 'Novo Ticket' }}
+      />
+      <Stack.Screen
+        name="TicketDetails"
+        component={TicketDetails}
+        options={{ title: 'Detalhes do Ticket' }}
+      />
     </Stack.Navigator>
   );
 };
@@ -116,7 +124,7 @@ const AppRoutes = () => {
               ),
             }}
             listeners={{
-              tabPress: (e) => {
+              tabPress: e => {
                 e.preventDefault();
                 toggleTheme();
               },
@@ -127,7 +135,7 @@ const AppRoutes = () => {
             component={NetworkToggleScreen}
             options={{
               tabBarLabel: isOnline ? 'Online' : 'Offline',
-              tabBarIcon: ({ color, size }) => (
+              tabBarIcon: ({ size }) => (
                 <Ionicons
                   name={isOnline ? 'cloud-outline' : 'cloud-offline-outline'}
                   size={size}
@@ -137,7 +145,7 @@ const AppRoutes = () => {
               tabBarActiveTintColor: isOnline ? theme.colors.primary : theme.colors.error,
             }}
             listeners={{
-              tabPress: (e) => {
+              tabPress: e => {
                 e.preventDefault();
                 toggleNetwork();
               },
@@ -150,4 +158,3 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
-
